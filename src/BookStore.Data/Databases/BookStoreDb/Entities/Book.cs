@@ -13,10 +13,10 @@ public partial class Book
     [Column("BOOK_ID")]
     public int BookId { get; set; }
 
-    [Column("NAME")]
+    [Column("TITLE")]
     [StringLength(200)]
     [Unicode(false)]
-    public string Name { get; set; } = null!;
+    public string Title { get; set; } = null!;
 
     [Column("SYNOPSIS")]
     [Unicode(false)]
