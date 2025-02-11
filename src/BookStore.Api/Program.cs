@@ -7,6 +7,9 @@ namespace BookStore.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            //Cadenas de conexión
+            var bookStoreConnectionString = builder.Configuration.GetConnectionString("BookStoreDb");
+
             // Add services to the container.
 
             builder.Services.AddControllers();

@@ -23,4 +23,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Databases\" />
+    <Folder Include="Databases\BookStoreDb\" />
+    <Folder Include="Databases\BookStoreDb\Entities\" />
+    <Folder Include="Repository\" />
+    <Folder Include="UnitOfWork\" />
+  </ItemGroup>
+
 </Project>
