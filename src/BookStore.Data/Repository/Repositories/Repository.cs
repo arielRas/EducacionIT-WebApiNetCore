@@ -10,16 +10,16 @@ namespace BookStore.Data.Repository.Repositories;
 public class Repository<T> : IRepository<T> where T : class
 {
     protected readonly BookStoreDbContext _context;
-    protected DbSet<T> dbSet;    
+    protected DbSet<T> dbSet;
 
     public Repository(BookStoreDbContext context)
     {
         _context = context;
         dbSet = context.Set<T>();
-    } 
+    }
 
-    public async Task<T> GetByIdAsync(Expression<Func<T, bool>> idFilter)
-        => await dbSet.Where(idFilter).FirstOrDefaultAsync() ?? throw new ResourceNotFoundException();
+    public async Task<T> GetByIdAsync(int id)
+        => await dbSet.FindAsync() ?? throw new ResourceNotFoundException();
 
     public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
     {
@@ -36,17 +36,28 @@ public class Repository<T> : IRepository<T> where T : class
         await SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Expression<Func<T, bool>> idFilter)
+    public async Task UpdateAsync(int id, T entity)
     {
-        var existingEntity = await dbSet.Where(idFilter)
-                                        .FirstOrDefaultAsync()
-                                        ?? throw new ResourceNotFoundException();
+        var existingEntity = await dbSet.FindAsync(id) 
+            ?? throw new ResourceNotFoundException();
+
+        _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+
+        await SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var existingEntity = await dbSet.FindAsync(id) 
+            ?? throw new ResourceNotFoundException();
 
         dbSet.Remove(existingEntity);
 
         await SaveChangesAsync();
-    } 
+    }
 
     private async Task SaveChangesAsync()
-        => await _context.SaveChangesAsync();    
+        => await _context.SaveChangesAsync();
+
+
 }
