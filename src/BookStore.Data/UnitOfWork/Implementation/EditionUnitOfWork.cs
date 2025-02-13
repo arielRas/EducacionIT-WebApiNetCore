@@ -12,6 +12,7 @@ public class EditionUnitOfWork : IEditionUnitOfWork
     private IEditionRepository? _editionRepository;
     private IEditionPriceRepository? _editionPriceRepository;
     private IEditionStockRepository? _editionStockRepository;
+    private IIsbnRepository? _isbnRepository;
 
     public EditionUnitOfWork(BookStoreDbContext context)
         => _context = context;
@@ -24,6 +25,9 @@ public class EditionUnitOfWork : IEditionUnitOfWork
 
     public IEditionStockRepository EditionStockRepository 
         => _editionStockRepository ??= new EditionStockRepository(_context);
+
+    public IIsbnRepository IsbnRepository 
+        => _isbnRepository ??= new IsbnRepository(_context);
 
     public void Dispose()
         => _context?.Dispose();

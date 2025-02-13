@@ -8,4 +8,5 @@ public interface IEditionUnitOfWork : IUnitOfWork
     IEditionRepository EditionRepository {get;}
     IEditionPriceRepository EditionPriceRepository {get;}
     IEditionStockRepository EditionStockRepository{get;}
+    IIsbnRepository IsbnRepository{get;}
 }
