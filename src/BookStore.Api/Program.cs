@@ -1,4 +1,11 @@
 
+using BookStore.Data.Databases.BookStoreDb;
+using BookStore.Data.Repository.Interfaces;
+using BookStore.Data.Repository.Repositories;
+using BookStore.Services.Implementations;
+using BookStore.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 namespace BookStore.Api
 {
     public class Program
@@ -9,6 +16,15 @@ namespace BookStore.Api
 
             //Cadenas de conexión
             var bookStoreConnectionString = builder.Configuration.GetConnectionString("BookStoreDb");
+
+            //Contextos de Base de datos
+            builder.Services.AddDbContext<BookStoreDbContext>(option =>
+                option.UseSqlServer(bookStoreConnectionString));
+
+            //Inyeccion de dependencias
+            builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+            builder.Services.AddScoped<IGenreService, GenreService>();
+
 
             // Add services to the container.
 

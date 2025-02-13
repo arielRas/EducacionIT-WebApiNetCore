@@ -45,7 +45,7 @@ public class GenreRepository : IGenreRepository
         var existingEntity = await _dbSet.FirstOrDefaultAsync(g => g.Code == code)
             ?? throw new ResourceNotFoundException($"The genre with code: {code} has not been found");
         
-        _context.Entry(existingEntity).CurrentValues.SetValues(genre);
+        existingEntity.Name = genre.Name;
 
         await _context.SaveChangesAsync();
     }
