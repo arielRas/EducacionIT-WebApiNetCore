@@ -7,8 +7,8 @@ public interface IEditionService
 {
     Task<EditionDto> GetByIdAsync(Guid id);    
     Task<IEnumerable<EditionDto>> GetAllAsync();
-    Task<EditionDto> GetFilteredAsync(string filter);
-    Task CreateAsync(EditionDto author);
-    Task UpdateAsync(EditionDto author);
+    Task<IEnumerable<EditionDto>> GetAllFilteredAsync(string filter);
+    Task CreateAsync(EditionDto edition);
+    Task UpdateAsync(Guid id, EditionDto edition);
     Task DeleteAsync(Guid id);
 }
