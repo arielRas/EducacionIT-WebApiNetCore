@@ -29,6 +29,12 @@ public class BookRepository : IBookRepository
     {
         return await _dbset.Include(b => b.Author)
                            .Include(b => b.Genre)
+                           .Include(b => b.Edition)
+                                .ThenInclude(e => e.Isbn)
+                           .Include(b => b.Edition)                           
+                                .ThenInclude(e => e.EditionType)
+                            .Include(b => b.Edition)
+                                .ThenInclude(e => e.Editorial)
                            .FirstOrDefaultAsync(b => b.BookId == id)
                            ?? throw new ResourceNotFoundException($"The book with ID: {id} has not been found");
     }
