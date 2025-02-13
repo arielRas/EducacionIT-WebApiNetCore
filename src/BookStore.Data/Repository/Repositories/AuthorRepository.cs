@@ -36,7 +36,8 @@ public class AuthorRepository : IAuthorRepository
     {
         var authors = await _dbSet.ToListAsync();
 
-        if(!authors.Any()) throw new ResourceNotFoundException($"There are no authors to display");
+        if(!authors.Any()) 
+            throw new ResourceNotFoundException($"There are no authors to display");
 
         return authors;
     }
