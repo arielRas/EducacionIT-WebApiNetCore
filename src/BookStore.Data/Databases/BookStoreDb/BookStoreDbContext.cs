@@ -103,6 +103,8 @@ public partial class BookStoreDbContext : DbContext
 
         modelBuilder.Entity<EditionPrice>(entity =>
         {
+            entity.ToTable("EDITION_PRICE", tb => tb.HasTrigger("TRG_INSERT_HISTORY_PRICE"));
+
             entity.Property(e => e.EditionId).ValueGeneratedNever();
 
             entity.HasOne(d => d.Edition).WithOne(p => p.EditionPrice)

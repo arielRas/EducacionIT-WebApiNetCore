@@ -21,7 +21,7 @@ public partial class Author
     [Column("LAST_NAME")]
     [StringLength(50)]
     [Unicode(false)]
-    public string LastName { get; set; } = null!;
+    public string? LastName { get; set; }
 
     [ForeignKey("AuthorId")]
     [InverseProperty("Author")]
