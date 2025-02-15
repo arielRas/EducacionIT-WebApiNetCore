@@ -54,7 +54,7 @@ public class BookRepository : IBookRepository
     {
         IQueryable<Book> query = _dbset.AsQueryable();
 
-        query = query.Where(predicate: b =>
+        query = query.Where(b =>
             b.Title.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
             b.Genre.Any(g => g.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)) ||          
             b.Author.Any(a => 

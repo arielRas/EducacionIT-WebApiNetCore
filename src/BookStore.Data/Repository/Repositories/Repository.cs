@@ -19,7 +19,7 @@ public class Repository<T> : IRepository<T> where T : class
     }
 
     public async Task<T> GetByIdAsync(int id)
-        => await dbSet.FindAsync() ?? throw new ResourceNotFoundException();
+        => await dbSet.FindAsync(id) ?? throw new ResourceNotFoundException();
 
     public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
     {
