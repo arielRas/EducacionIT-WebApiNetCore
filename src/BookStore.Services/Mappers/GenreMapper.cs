@@ -6,7 +6,7 @@ namespace BookStore.Services.Mappers;
 
 internal static class GenreMapper
 {
-    public static Genre ToDao(GenreDto dto)
+    public static Genre ToDao(this GenreDto dto)
     {
         return new Genre
         {
@@ -15,7 +15,7 @@ internal static class GenreMapper
         };
     }
 
-    public static GenreDto ToDto(Genre dao)
+    public static GenreDto ToDto(this Genre dao)
     {
         return new GenreDto
         {

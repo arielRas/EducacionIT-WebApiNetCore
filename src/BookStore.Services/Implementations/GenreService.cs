@@ -20,9 +20,7 @@ public class GenreService : IGenreService
     {
         try
         {
-            var genre = await _repository.GetByCodeAsync(code);
-
-            return GenreMapper.ToDto(genre);
+            return (await _repository.GetByCodeAsync(code)).ToDto();
         }
         catch(ResourceNotFoundException) 
         {
@@ -38,9 +36,7 @@ public class GenreService : IGenreService
     {
         try
         {
-            var genres = await _repository.GetAllAsync();
-
-            return genres.Select(GenreMapper.ToDto);
+            return (await _repository.GetAllAsync()).Select(g => g.ToDto());
         }
         catch(ResourceNotFoundException) 
         {
@@ -56,11 +52,11 @@ public class GenreService : IGenreService
     {
         try
         {
-            var genreDao = GenreMapper.ToDao(genre);
+            var genreDao = genre.ToDao();
 
             await _repository.CreateAsync(genreDao);
 
-            return GenreMapper.ToDto(genreDao);
+            return genreDao.ToDto();
         }
         catch(Exception)
         {
@@ -72,7 +68,7 @@ public class GenreService : IGenreService
     {
         try
         {
-            await _repository.UpdateAsync(code, GenreMapper.ToDao(genre));
+            await _repository.UpdateAsync(code, genre.ToDao());
         }
         catch(ResourceNotFoundException) 
         {

@@ -18,9 +18,7 @@ public class EditionTypeService : IEditionTypeService
     {
         try
         {
-            var editionType = await _repository.GetByCodeAsync(code);
-
-            return EditionTypeMapper.ToDto(editionType);
+            return (await _repository.GetByCodeAsync(code)).ToDto();
         }
         catch(ResourceNotFoundException) 
         {
@@ -38,7 +36,7 @@ public class EditionTypeService : IEditionTypeService
         {
             var editionTypes = await _repository.GetAllAsync();
 
-            return editionTypes.Select(EditionTypeMapper.ToDto);
+            return editionTypes.Select(e => e.ToDto());
         }
         catch(ResourceNotFoundException) 
         {
@@ -54,11 +52,11 @@ public class EditionTypeService : IEditionTypeService
     {
         try
         {
-            var editionTypeDao = EditionTypeMapper.ToDao(type);
+            var editionTypeDao = type.ToDao();
 
             await _repository.CreateAsync(editionTypeDao);
 
-            return EditionTypeMapper.ToDto(editionTypeDao);
+            return editionTypeDao.ToDto();
         }
         catch(Exception)
         {
@@ -70,7 +68,7 @@ public class EditionTypeService : IEditionTypeService
     {
         try
         {
-            await _repository.UpdateAsync(code, EditionTypeMapper.ToDao(type));
+            await _repository.UpdateAsync(code, type.ToDao());
         }
         catch(ResourceNotFoundException) 
         {

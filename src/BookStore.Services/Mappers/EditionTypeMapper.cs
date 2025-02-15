@@ -5,7 +5,7 @@ namespace BookStore.Services.Mappers;
 
 internal static class EditionTypeMapper
 {
-    public static EditionType ToDao(EditionTypeDto dto)
+    public static EditionType ToDao(this EditionTypeDto dto)
     {
         return new EditionType
         {
@@ -14,7 +14,7 @@ internal static class EditionTypeMapper
         };
     }
 
-    public static EditionTypeDto ToDto(EditionType dao)
+    public static EditionTypeDto ToDto(this EditionType dao)
     {
         return new EditionTypeDto
         {

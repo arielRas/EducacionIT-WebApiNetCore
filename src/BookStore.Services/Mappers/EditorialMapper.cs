@@ -6,7 +6,7 @@ namespace BookStore.Services.Mappers;
 
 internal static class EditorialMapper
 {
-    public static Editorial ToDao(EditorialDto dto)
+    public static Editorial ToDao(this EditorialDto dto)
     {
         return new Editorial
         {
@@ -15,7 +15,7 @@ internal static class EditorialMapper
         };
     }
 
-    public static EditorialDto ToDto(Editorial dao)
+    public static EditorialDto ToDto(this Editorial dao)
     {
         return new EditorialDto
         {

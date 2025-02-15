@@ -18,9 +18,7 @@ public class EditorialService : IEditorialService
     {
         try
         {
-            var editorial = await _repository.GetByIdAsync(id);
-
-            return EditorialMapper.ToDto(editorial);
+            return (await _repository.GetByIdAsync(id)).ToDto();
         }
         catch(ResourceNotFoundException) 
         {
@@ -36,9 +34,7 @@ public class EditorialService : IEditorialService
     {
         try
         {
-            var editorials = await _repository.GetAllAsync();
-
-            return editorials.Select(EditorialMapper.ToDto);
+            return (await _repository.GetAllAsync()).Select(e => e.ToDto());
         }
         catch(ResourceNotFoundException) 
         {
@@ -54,11 +50,11 @@ public class EditorialService : IEditorialService
     {
         try
         {
-            var editorialDao = EditorialMapper.ToDao(editorial);
+            var editorialDao = editorial.ToDao();
 
             await _repository.CreateAsync(editorialDao);
 
-            return EditorialMapper.ToDto(editorialDao);
+            return editorialDao.ToDto();
         }
         catch(Exception)
         {
@@ -70,7 +66,7 @@ public class EditorialService : IEditorialService
     {
         try
         {
-            await _repository.UpdateAsync(id, EditorialMapper.ToDao(editorial));
+            await _repository.UpdateAsync(id, editorial.ToDao());
         }
         catch(ResourceNotFoundException) 
         {
