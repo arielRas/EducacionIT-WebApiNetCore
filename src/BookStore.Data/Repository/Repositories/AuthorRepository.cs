@@ -46,7 +46,7 @@ public class AuthorRepository : IAuthorRepository
     {
         var query = _dbSet.AsQueryable();
 
-        query = query.Where(a => a.Name.Contains(filter) || a.LastName.Contains(filter));
+        query = query.Where(a => a.Name.Contains(filter) || (a.LastName != null && a.LastName.Contains(filter)));
 
         var authors = await query.ToListAsync();
 

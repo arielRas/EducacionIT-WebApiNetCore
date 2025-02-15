@@ -24,6 +24,8 @@ namespace BookStore.Api
             //Inyeccion de dependencias
             builder.Services.AddScoped<IGenreRepository, GenreRepository>();
             builder.Services.AddScoped<IGenreService, GenreService>();
+            builder.Services.AddScoped<IEditionTypeRepository, EditionTypeRepository>();
+            builder.Services.AddScoped<IEditionTypeService, EditionTypeService>();
 
 
             // Add services to the container.

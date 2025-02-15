@@ -5,6 +5,7 @@ using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.Configuration;
 
 namespace BookStore.Data.Repository.Repositories;
 
@@ -53,12 +54,12 @@ public class BookRepository : IBookRepository
     {
         IQueryable<Book> query = _dbset.AsQueryable();
 
-        query = query.Where(b =>
+        query = query.Where(predicate: b =>
             b.Title.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
-            b.Edition.Any() ||
+            b.Genre.Any(g => g.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)) ||          
             b.Author.Any(a => 
                 a.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase) || 
-                a.LastName.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                (a.LastName != null && a.LastName.Contains(filter, StringComparison.CurrentCultureIgnoreCase))
             )
         );                     
 
