@@ -33,7 +33,7 @@ internal static class AuthorMapper
             Id = dao.AuthorId,
             Name = dao.Name,
             LastName = !string.IsNullOrWhiteSpace(dao.LastName) ? dao.LastName : string.Empty,
-            Books = !dao.Book.Any()
+            Books = dao.Book.Any()
                     ? dao.Book.Select(b => b.ToDto()).ToList()
                     : null
         };

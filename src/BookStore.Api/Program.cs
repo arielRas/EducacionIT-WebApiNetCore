@@ -28,6 +28,8 @@ namespace BookStore.Api
             builder.Services.AddScoped<IEditionTypeService, EditionTypeService>();
             builder.Services.AddScoped<IEditorialRepository, EditorialRepository>();
             builder.Services.AddScoped<IEditorialService, EditorialService>();
+            builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+            builder.Services.AddScoped<IAuthorService, AuthorService>();
 
 
             // Add services to the container.

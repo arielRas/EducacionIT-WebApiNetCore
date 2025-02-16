@@ -18,7 +18,9 @@ public class AuthorService : IAuthorService
     {        
         try
         {
-            return (await _repository.GetByIdWithRelationshipsAsync(id)).ToResponseDto();
+            var author = await _repository.GetByIdWithRelationshipsAsync(id);
+            
+            return author.ToResponseDto();
         }
         catch(ResourceNotFoundException) 
         {
@@ -29,7 +31,7 @@ public class AuthorService : IAuthorService
             throw;
         }
     }
-    
+
     public async Task<IEnumerable<AuthorDto>> GetAllFilteredAsync(string filter)
     {
         try
