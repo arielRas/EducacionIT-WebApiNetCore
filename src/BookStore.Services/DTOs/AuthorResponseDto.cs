@@ -4,5 +4,5 @@ namespace BookStore.Services.DTOs;
 
 public record AuthorResponseDto : AuthorDto
 {
-    public required List<BookDto> Books { get; set; }
+    public List<BookDto>? Books { get; set; }
 }

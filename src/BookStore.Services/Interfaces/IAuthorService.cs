@@ -7,8 +7,8 @@ public interface IAuthorService
 {
     Task<AuthorDto> GetByIdAsync(int id);    
     Task<IEnumerable<AuthorDto>> GetAllAsync();
-    Task<AuthorDto> GetFilteredAsync(string filter);
-    Task CreateAsync(AuthorDto author);
-    Task UpdateAsync(AuthorDto author);
+    Task<IEnumerable<AuthorDto>> GetAllFilteredAsync(string filter);
+    Task<AuthorDto> CreateAsync(AuthorDto author);
+    Task UpdateAsync(int id, AuthorDto author);
     Task DeleteAsync(int id);
 }
