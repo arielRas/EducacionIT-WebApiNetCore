@@ -25,5 +25,5 @@ public partial class Author
 
     [ForeignKey("AuthorId")]
     [InverseProperty("Author")]
-    public virtual ICollection<Book> Book { get; set; } = new List<Book>();
+    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

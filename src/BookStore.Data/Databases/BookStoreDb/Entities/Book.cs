@@ -23,13 +23,13 @@ public partial class Book
     public string? Synopsis { get; set; }
 
     [InverseProperty("Book")]
-    public virtual ICollection<Edition> Edition { get; set; } = new List<Edition>();
+    public virtual ICollection<Edition> Editions { get; set; } = new List<Edition>();
 
     [ForeignKey("BookId")]
     [InverseProperty("Book")]
-    public virtual ICollection<Author> Author { get; set; } = new List<Author>();
+    public virtual ICollection<Author> Authors { get; set; } = new List<Author>();
 
     [ForeignKey("BookId")]
     [InverseProperty("Book")]
-    public virtual ICollection<Genre> Genre { get; set; } = new List<Genre>();
+    public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -27,8 +26,10 @@ public partial class Edition
     [Column("BOOK_ID")]
     public int BookId { get; set; }
 
-    [Column("EDITION_TYPE_ID")]
-    public int EditionTypeId { get; set; }
+    [Column("TYPE_CODE")]
+    [StringLength(5)]
+    [Unicode(false)]
+    public string TypeCode { get; set; } = null!;
 
     [Column("EDITORIAL_ID")]
     public int EditorialId { get; set; }
@@ -40,13 +41,6 @@ public partial class Edition
     [InverseProperty("Edition")]
     public virtual EditionPrice? EditionPrice { get; set; }
 
-    [InverseProperty("Edition")]
-    public virtual EditionStock? EditionStock { get; set; }
-
-    [ForeignKey("EditionTypeId")]
-    [InverseProperty("Edition")]
-    public virtual EditionType EditionType { get; set; } = null!;
-
     [ForeignKey("EditorialId")]
     [InverseProperty("Edition")]
     public virtual Editorial Editorial { get; set; } = null!;
@@ -56,4 +50,8 @@ public partial class Edition
 
     [InverseProperty("Edition")]
     public virtual Isbn? Isbn { get; set; }
+
+    [ForeignKey("TypeCode")]
+    [InverseProperty("Edition")]
+    public virtual EditionType TypeCodeNavigation { get; set; } = null!;
 }

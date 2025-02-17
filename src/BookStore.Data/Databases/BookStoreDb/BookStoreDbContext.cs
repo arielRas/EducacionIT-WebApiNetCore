@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using BookStore.Data.Databases.BookStoreDb.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,8 +23,6 @@ public partial class BookStoreDbContext : DbContext
 
     public virtual DbSet<EditionPrice> EditionPrice { get; set; }
 
-    public virtual DbSet<EditionStock> EditionStock { get; set; }
-
     public virtual DbSet<EditionType> EditionType { get; set; }
 
     public virtual DbSet<Editorial> Editorial { get; set; }
@@ -43,7 +40,7 @@ public partial class BookStoreDbContext : DbContext
     {
         modelBuilder.Entity<Book>(entity =>
         {
-            entity.HasMany(d => d.Author).WithMany(p => p.Book)
+            entity.HasMany(d => d.Authors).WithMany(p => p.Books)
                 .UsingEntity<Dictionary<string, object>>(
                     "BookAuthor",
                     r => r.HasOne<Author>().WithMany()
@@ -62,11 +59,11 @@ public partial class BookStoreDbContext : DbContext
                         j.IndexerProperty<int>("AuthorId").HasColumnName("AUTHOR_ID");
                     });
 
-            entity.HasMany(d => d.Genre).WithMany(p => p.Book)
+            entity.HasMany(d => d.Genres).WithMany(p => p.Book)
                 .UsingEntity<Dictionary<string, object>>(
                     "BookGenre",
                     r => r.HasOne<Genre>().WithMany()
-                        .HasForeignKey("GenreId")
+                        .HasForeignKey("GenreCode")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_BOOK_GENRE_GENRE"),
                     l => l.HasOne<Book>().WithMany()
@@ -75,10 +72,13 @@ public partial class BookStoreDbContext : DbContext
                         .HasConstraintName("FK_BOOK_GENRE_BOOK"),
                     j =>
                     {
-                        j.HasKey("BookId", "GenreId");
+                        j.HasKey("BookId", "GenreCode");
                         j.ToTable("BOOK_GENRE");
                         j.IndexerProperty<int>("BookId").HasColumnName("BOOK_ID");
-                        j.IndexerProperty<int>("GenreId").HasColumnName("GENRE_ID");
+                        j.IndexerProperty<string>("GenreCode")
+                            .HasMaxLength(5)
+                            .IsUnicode(false)
+                            .HasColumnName("GENRE_CODE");
                     });
         });
 
@@ -88,17 +88,17 @@ public partial class BookStoreDbContext : DbContext
 
             entity.Property(e => e.EditionId).HasDefaultValueSql("(newid())");
 
-            entity.HasOne(d => d.Book).WithMany(p => p.Edition)
+            entity.HasOne(d => d.Book).WithMany(p => p.Editions)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EDITION_BOOK");
-
-            entity.HasOne(d => d.EditionType).WithMany(p => p.Edition)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_EDITION_EDITION_TYPE");
 
             entity.HasOne(d => d.Editorial).WithMany(p => p.Edition)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EDITION_EDITORIAL");
+
+            entity.HasOne(d => d.TypeCodeNavigation).WithMany(p => p.Edition)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EDITION_EDITION_TYPE");
         });
 
         modelBuilder.Entity<EditionPrice>(entity =>
@@ -110,15 +110,6 @@ public partial class BookStoreDbContext : DbContext
             entity.HasOne(d => d.Edition).WithOne(p => p.EditionPrice)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("PK_EDITION_PRICE_EDITION");
-        });
-
-        modelBuilder.Entity<EditionStock>(entity =>
-        {
-            entity.Property(e => e.EditionId).ValueGeneratedNever();
-
-            entity.HasOne(d => d.Edition).WithOne(p => p.EditionStock)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("PK_EDITION_STOCK_EDITION");
         });
 
         modelBuilder.Entity<HistoryPrice>(entity =>
