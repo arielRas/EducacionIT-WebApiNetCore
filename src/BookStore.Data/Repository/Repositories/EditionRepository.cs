@@ -25,7 +25,6 @@ public class EditionRepository : IEditionRepository
                            .Include(e => e.Editorial)
                            .Include(e => e.EditionType)
                            .Include(e => e.EditionPrice)
-                           .Include(e => e.EditionStock)
                            .FirstOrDefaultAsync(e => e.EditionId == id)
                            ?? throw new ResourceNotFoundException($"The book edition with ID: {id} has not been found");
     }

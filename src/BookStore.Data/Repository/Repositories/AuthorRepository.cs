@@ -27,7 +27,7 @@ public class AuthorRepository : IAuthorRepository
 
     public async Task<Author> GetByIdWithRelationshipsAsync(int id)
     {
-        return await _dbSet.Include(a => a.Book)
+        return await _dbSet.Include(a => a.Books)
                            .FirstOrDefaultAsync(a => a.AuthorId == id)
                            ?? throw new ResourceNotFoundException($"The author with ID: {id} has not been found");
     }

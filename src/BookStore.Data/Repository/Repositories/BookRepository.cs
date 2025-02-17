@@ -28,13 +28,13 @@ public class BookRepository : IBookRepository
 
     public async Task<Book> GetByIdWithRelationshipsAsync(int id)
     {
-        return await _dbset.Include(b => b.Author)
-                           .Include(b => b.Genre)
-                           .Include(b => b.Edition)
+        return await _dbset.Include(b => b.Authors)
+                           .Include(b => b.Genres)
+                           .Include(b => b.Editions)
                                 .ThenInclude(e => e.Isbn)
-                           .Include(b => b.Edition)                           
+                           .Include(b => b.Editions)                           
                                 .ThenInclude(e => e.EditionType)
-                            .Include(b => b.Edition)
+                            .Include(b => b.Editions)
                                 .ThenInclude(e => e.Editorial)
                            .FirstOrDefaultAsync(b => b.BookId == id)
                            ?? throw new ResourceNotFoundException($"The book with ID: {id} has not been found");
@@ -56,8 +56,8 @@ public class BookRepository : IBookRepository
 
         query = query.Where(b =>
             b.Title.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
-            b.Genre.Any(g => g.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)) ||          
-            b.Author.Any(a => 
+            b.Genres.Any(g => g.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)) ||          
+            b.Authors.Any(a => 
                 a.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase) || 
                 (a.LastName != null && a.LastName.Contains(filter, StringComparison.CurrentCultureIgnoreCase))
             )

@@ -1,6 +1,4 @@
 using System;
-using System.IO.Compression;
-using System.Runtime.CompilerServices;
 using BookStore.Common.Exceptions;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Databases.BookStoreDb.Entities;
@@ -18,17 +16,11 @@ public class GenreRepository : IGenreRepository
         _context = context;
         _dbSet = _context.Set<Genre>();
     }
-     
-    public async Task<Genre> GetByIdAsync(int id)
-    {
-        return await _dbSet.FindAsync(id)
-                          ?? throw new ResourceNotFoundException($"The genre with ID: {id} has not been found");
-    }
 
     public async Task<Genre> GetByCodeAsync(string code)
     {
-        return await _dbSet.FirstOrDefaultAsync(g => g.Code == code)
-                          ?? throw new ResourceNotFoundException($"The genre with code: {code} has not been found");
+        return await _dbSet.FindAsync(code)
+            ?? throw new ResourceNotFoundException($"The genre with code: {code} has not been found");
     }
 
     public async Task<IEnumerable<Genre>> GetAllAsync()

@@ -19,14 +19,8 @@ public class EditionTypeRepository : IEditionTypeRepository
 
     public async Task<EditionType> GetByCodeAsync(string code)
     {
-        return await _dbSet.FirstOrDefaultAsync(g => g.Code == code)
+        return await _dbSet.FindAsync(code)
             ?? throw new ResourceNotFoundException($"The edition type with code: {code} has not been found");
-    }
-
-    public async Task<EditionType> GetByIdAsync(int id)
-    {
-        return await _dbSet.FindAsync(id)
-            ?? throw new ResourceNotFoundException($"The edition type with ID: {id} has not been found");
     }
 
     public async Task<IEnumerable<EditionType>> GetAllAsync()

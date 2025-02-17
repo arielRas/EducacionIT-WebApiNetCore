@@ -96,7 +96,7 @@ public partial class BookStoreDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EDITION_EDITORIAL");
 
-            entity.HasOne(d => d.TypeCodeNavigation).WithMany(p => p.Edition)
+            entity.HasOne(d => d.EditionType).WithMany(p => p.Edition)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EDITION_EDITION_TYPE");
         });

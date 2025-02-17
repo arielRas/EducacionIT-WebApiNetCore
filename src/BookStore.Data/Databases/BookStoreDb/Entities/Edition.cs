@@ -53,5 +53,5 @@ public partial class Edition
 
     [ForeignKey("TypeCode")]
     [InverseProperty("Edition")]
-    public virtual EditionType TypeCodeNavigation { get; set; } = null!;
+    public virtual EditionType EditionType { get; set; } = null!;
 }

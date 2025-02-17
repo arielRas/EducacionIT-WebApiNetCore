@@ -11,7 +11,6 @@ public class EditionUnitOfWork : IEditionUnitOfWork
     private readonly BookStoreDbContext _context;
     private IEditionRepository? _editionRepository;
     private IEditionPriceRepository? _editionPriceRepository;
-    private IEditionStockRepository? _editionStockRepository;
     private IIsbnRepository? _isbnRepository;
 
     public EditionUnitOfWork(BookStoreDbContext context)
@@ -22,9 +21,6 @@ public class EditionUnitOfWork : IEditionUnitOfWork
 
     public IEditionPriceRepository EditionPriceRepository 
         => _editionPriceRepository ??= new EditionPriceRepository(_context);
-
-    public IEditionStockRepository EditionStockRepository 
-        => _editionStockRepository ??= new EditionStockRepository(_context);
 
     public IIsbnRepository IsbnRepository 
         => _isbnRepository ??= new IsbnRepository(_context);
