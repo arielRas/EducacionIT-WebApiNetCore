@@ -15,4 +15,26 @@ internal static class BookMapper
             Synopsis = !string.IsNullOrWhiteSpace(dao.Synopsis) ? dao.Synopsis : null
         };
     }
+
+    public static BookResponseDto ToResponseDto(this Book dao)
+    {
+        return new BookResponseDto
+        {
+            Id = dao.BookId,
+            Title = dao.Title,
+            Synopsis = !string.IsNullOrWhiteSpace(dao.Synopsis) ? dao.Synopsis : null,
+            Genres = dao.Genre.Select(g => g.ToDto()).ToList(),
+            Authors = dao.Author.Select(a => a.ToDto()).ToList()
+        };
+    }
+
+    public static Book ToDao(this Book dto)
+    {
+        return new Book
+        {
+            BookId = dto.BookId,
+            Title = dto.Title,
+            Synopsis = !string.IsNullOrWhiteSpace(dto.Synopsis) ? dto.Synopsis : null
+        };
+    }
 }
