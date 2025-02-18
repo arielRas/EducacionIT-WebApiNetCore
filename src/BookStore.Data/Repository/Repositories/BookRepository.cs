@@ -5,7 +5,6 @@ using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols.Configuration;
 
 namespace BookStore.Data.Repository.Repositories;
 
@@ -30,12 +29,8 @@ public class BookRepository : IBookRepository
     {
         return await _dbset.Include(b => b.Authors)
                            .Include(b => b.Genres)
-                           .Include(b => b.Editions)
-                                .ThenInclude(e => e.Isbn)
                            .Include(b => b.Editions)                           
                                 .ThenInclude(e => e.EditionType)
-                            .Include(b => b.Editions)
-                                .ThenInclude(e => e.Editorial)
                            .FirstOrDefaultAsync(b => b.BookId == id)
                            ?? throw new ResourceNotFoundException($"The book with ID: {id} has not been found");
     }

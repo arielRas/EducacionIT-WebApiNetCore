@@ -24,15 +24,16 @@ internal static class BookMapper
             Title = dao.Title,
             Synopsis = !string.IsNullOrWhiteSpace(dao.Synopsis) ? dao.Synopsis : null,
             Genres = dao.Genres.Select(g => g.ToDto()).ToList(),
-            Authors = dao.Authors.Select(a => a.ToDto()).ToList(),            
+            Authors = dao.Authors.Select(a => a.ToDto()).ToList(),
+            Editions = dao.Editions.Select(e => e.EditionType.Code).ToList()         
         };
     }
 
-    public static Book ToDao(this Book dto)
+    public static Book ToDao(this BookDto dto)
     {
         return new Book
         {
-            BookId = dto.BookId,
+            BookId = dto.Id,
             Title = dto.Title,
             Synopsis = !string.IsNullOrWhiteSpace(dto.Synopsis) ? dto.Synopsis : null
         };
