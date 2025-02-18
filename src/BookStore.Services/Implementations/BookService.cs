@@ -9,17 +9,23 @@ namespace BookStore.Services.Implementations;
 
 public class BookService : IBookService
 {   
-    private readonly IBookRepository _repository;
+    private readonly IBookRepository _bookRepository;
+    private readonly IGenreRepository _genreRepository;
+    private readonly IAuthorRepository _authorRepository;
 
-    public BookService(IBookRepository repository)
-        => _repository = repository;
+    public BookService(IBookRepository repository, IAuthorRepository authorRepository, IGenreRepository genreRepository)
+    {
+        _bookRepository = repository;
+        _genreRepository = genreRepository;
+        _authorRepository = authorRepository;
+    }
 
 
     public async Task<BookResponseDto> GetByIdAsync(int id)
     {
         try
         {
-            return (await _repository.GetByIdWithRelationshipsAsync(id)).ToResponseDto();
+            return (await _bookRepository.GetByIdWithRelationshipsAsync(id)).ToResponseDto();
         }
         catch(ResourceNotFoundException) 
         {
@@ -35,7 +41,7 @@ public class BookService : IBookService
     {
         try
         {
-            return (await _repository.GetAllAsync()).Select(b => b.ToDto());
+            return (await _bookRepository.GetAllAsync()).Select(b => b.ToDto());
         }
         catch(ResourceNotFoundException) 
         {
@@ -51,7 +57,11 @@ public class BookService : IBookService
     {
         try
         {
-            return (await _repository.GetAllFilteredByTitleOrAuthorAsync(filter)).Select(b => b.ToDto());
+            filter = filter.ToLower().Trim();
+
+            var books = await _bookRepository.GetAllFilteredByTitleOrAuthorAsync(filter);
+
+            return books.Select(b => b.ToDto());
         }
         catch(ResourceNotFoundException) 
         {
@@ -63,15 +73,23 @@ public class BookService : IBookService
         }
     }
 
-    public async Task<BookDto> CreateAsync(BookDto book)
+    public async Task<BookDto> CreateAsync(BookRequestDto book)
     {
         try
         {
-            var bookDao = book.ToDao();
+            var authors = await _authorRepository.GetAllFilteredByIdAsync(book.AuthorsId);
 
-            await _repository.CreateAsync(bookDao);
+            var genres = await _genreRepository.GetAllFilteredByCodeAsync(book.Genres);
+
+            var bookDao = book.ToCreateDao(authors, genres);
+
+            await _bookRepository.CreateAsync(bookDao);
 
             return bookDao.ToDto();
+        }
+        catch(ResourceNotFoundException) 
+        {
+            throw;
         }
         catch(Exception)
         {
@@ -79,11 +97,15 @@ public class BookService : IBookService
         }
     }
 
-    public async Task UpdateAsync(int id, BookDto book)
+    public Task UpdateAsync(int id, BookDto book)
     {
         try
         {
-            await _repository.UpdateAsync(id, book.ToDao());
+            // book.Id = id;
+
+            // await _bookRepository.UpdateAsync(id, book.ToDao());
+
+            throw new NotImplementedException();
         }
         catch(ResourceNotFoundException) 
         {
@@ -99,7 +121,7 @@ public class BookService : IBookService
     {
         try
         {
-            await _repository.DeleteAsync(id);
+            await _bookRepository.DeleteAsync(id);
         }
         catch(ResourceNotFoundException) 
         {

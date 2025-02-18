@@ -50,13 +50,12 @@ public class BookRepository : IBookRepository
         IQueryable<Book> query = _dbset.AsQueryable();
 
         query = query.Where(b =>
-            b.Title.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
-            b.Genres.Any(g => g.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)) ||          
-            b.Authors.Any(a => 
-                a.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase) || 
-                (a.LastName != null && a.LastName.Contains(filter, StringComparison.CurrentCultureIgnoreCase))
-            )
-        );                     
+                        b.Title.ToLower().Contains(filter)||         
+                        b.Authors.Any(a => 
+                            a.Name.ToLower().Contains(filter) || 
+                            (a.LastName != null && a.LastName.Contains(filter))
+                        )   
+                    );                     
 
         var books = await query.ToListAsync();
 

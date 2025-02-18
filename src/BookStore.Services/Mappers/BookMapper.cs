@@ -23,19 +23,21 @@ internal static class BookMapper
             Id = dao.BookId,
             Title = dao.Title,
             Synopsis = !string.IsNullOrWhiteSpace(dao.Synopsis) ? dao.Synopsis : null,
-            Genres = dao.Genres.Select(g => g.ToDto()).ToList(),
+            Genres = dao.Genres.Select(g => g.Code).ToList(),
             Authors = dao.Authors.Select(a => a.ToDto()).ToList(),
-            Editions = dao.Editions.Select(e => e.EditionType.Code).ToList()         
+            Editions = dao.Editions?.Select(e => e.EditionType.Code).ToList()         
         };
     }
 
-    public static Book ToDao(this BookDto dto)
+    public static Book ToCreateDao(this BookRequestDto dto, IEnumerable<Author> authors, IEnumerable<Genre> genres)
     {
         return new Book
         {
             BookId = dto.Id,
             Title = dto.Title,
-            Synopsis = !string.IsNullOrWhiteSpace(dto.Synopsis) ? dto.Synopsis : null
+            Synopsis = !string.IsNullOrWhiteSpace(dto.Synopsis) ? dto.Synopsis : null,
+            Genres = genres.ToList(),
+            Authors = authors.ToList()
         };
     }
 }
