@@ -20,6 +20,6 @@ public partial class EditionType
     [Unicode(false)]
     public string Name { get; set; } = null!;
 
-    [InverseProperty("TypeCodeNavigation")]
-    public virtual ICollection<Edition> Edition { get; set; } = new List<Edition>();
+    [InverseProperty("EditionType")]
+    public virtual ICollection<Edition> Editions { get; set; } = new List<Edition>();
 }

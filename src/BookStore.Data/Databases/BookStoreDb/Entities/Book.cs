@@ -26,10 +26,10 @@ public partial class Book
     public virtual ICollection<Edition> Editions { get; set; } = new List<Edition>();
 
     [ForeignKey("BookId")]
-    [InverseProperty("Book")]
+    [InverseProperty("Books")]
     public virtual ICollection<Author> Authors { get; set; } = new List<Author>();
 
     [ForeignKey("BookId")]
-    [InverseProperty("Book")]
+    [InverseProperty("Books")]
     public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
 }

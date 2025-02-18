@@ -21,6 +21,6 @@ public partial class Genre
     public string Name { get; set; } = null!;
 
     [ForeignKey("GenreCode")]
-    [InverseProperty("GenreCode")]
-    public virtual ICollection<Book> Book { get; set; } = new List<Book>();
+    [InverseProperty("Genres")]
+    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

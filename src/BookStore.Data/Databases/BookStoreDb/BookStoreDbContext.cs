@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BookStore.Data.Databases.BookStoreDb.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,7 +60,7 @@ public partial class BookStoreDbContext : DbContext
                         j.IndexerProperty<int>("AuthorId").HasColumnName("AUTHOR_ID");
                     });
 
-            entity.HasMany(d => d.Genres).WithMany(p => p.Book)
+            entity.HasMany(d => d.Genres).WithMany(p => p.Books)
                 .UsingEntity<Dictionary<string, object>>(
                     "BookGenre",
                     r => r.HasOne<Genre>().WithMany()
@@ -96,7 +97,7 @@ public partial class BookStoreDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EDITION_EDITORIAL");
 
-            entity.HasOne(d => d.EditionType).WithMany(p => p.Edition)
+            entity.HasOne(d => d.EditionType).WithMany(p => p.Editions)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EDITION_EDITION_TYPE");
         });

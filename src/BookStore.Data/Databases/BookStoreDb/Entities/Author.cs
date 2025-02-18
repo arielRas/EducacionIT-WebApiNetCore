@@ -24,6 +24,6 @@ public partial class Author
     public string? LastName { get; set; }
 
     [ForeignKey("AuthorId")]
-    [InverseProperty("Author")]
+    [InverseProperty("Authors")]
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

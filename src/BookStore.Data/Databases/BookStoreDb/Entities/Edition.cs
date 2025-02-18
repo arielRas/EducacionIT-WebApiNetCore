@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ public partial class Edition
     public int EditorialId { get; set; }
 
     [ForeignKey("BookId")]
-    [InverseProperty("Edition")]
+    [InverseProperty("Editions")]
     public virtual Book Book { get; set; } = null!;
 
     [InverseProperty("Edition")]
@@ -52,6 +53,6 @@ public partial class Edition
     public virtual Isbn? Isbn { get; set; }
 
     [ForeignKey("TypeCode")]
-    [InverseProperty("Edition")]
+    [InverseProperty("Editions")]
     public virtual EditionType EditionType { get; set; } = null!;
 }
