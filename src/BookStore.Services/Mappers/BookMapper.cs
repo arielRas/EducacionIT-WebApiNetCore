@@ -23,8 +23,8 @@ internal static class BookMapper
             Id = dao.BookId,
             Title = dao.Title,
             Synopsis = !string.IsNullOrWhiteSpace(dao.Synopsis) ? dao.Synopsis : null,
-            Genres = dao.Genre.Select(g => g.ToDto()).ToList(),
-            Authors = dao.Author.Select(a => a.ToDto()).ToList()
+            Genres = dao.Genres.Select(g => g.ToDto()).ToList(),
+            Authors = dao.Authors.Select(a => a.ToDto()).ToList(),            
         };
     }
 
