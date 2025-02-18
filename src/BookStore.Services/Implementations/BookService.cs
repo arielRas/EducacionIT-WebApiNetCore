@@ -97,13 +97,13 @@ public class BookService : IBookService
         }
     }
 
-    public Task UpdateAsync(int id, BookDto book)
+    public async Task UpdateAsync(int id, BookDto book)
     {
         try
         {
-            // book.Id = id;
+            book.Id = id;
 
-            // await _bookRepository.UpdateAsync(id, book.ToDao());
+            await _bookRepository.UpdateAsync(id, book.ToDao());
 
             throw new NotImplementedException();
         }

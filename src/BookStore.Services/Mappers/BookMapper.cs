@@ -29,6 +29,16 @@ internal static class BookMapper
         };
     }
 
+    public static Book ToDao(this BookDto dto)
+    {
+        return new Book
+        {
+            BookId = dto.Id,
+            Title = dto.Title,
+            Synopsis = !string.IsNullOrWhiteSpace(dto.Synopsis) ? dto.Synopsis : null
+        };
+    }
+
     public static Book ToCreateDao(this BookRequestDto dto, IEnumerable<Author> authors, IEnumerable<Genre> genres)
     {
         return new Book
