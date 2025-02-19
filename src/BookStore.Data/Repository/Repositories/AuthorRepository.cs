@@ -44,7 +44,11 @@ public class AuthorRepository : IAuthorRepository
 
     public async Task<IEnumerable<Author>> GetAllFilteredByIdAsync(IEnumerable<int> idList)
     {
-        var authors = await _dbSet.Where(a => idList.Contains(a.AuthorId)).ToListAsync();
+        var query = _dbSet.AsQueryable();
+
+        query = query.AsNoTracking().Where(a => idList.Contains(a.AuthorId));
+
+        var authors = await query.ToListAsync();
 
         if(!authors.Any()) 
             throw new ResourceNotFoundException();

@@ -29,9 +29,13 @@ public class GenreRepository : IGenreRepository
 
     public async Task<IEnumerable<Genre>> GetAllFilteredByCodeAsync(IEnumerable<string> codeList)
     {
-        var genres = await _dbSet.Where(g => codeList.Contains(g.Code)).ToListAsync();
+        var query = _dbSet.AsQueryable();
 
-        if(!genres.Any())
+        query = query.AsNoTracking().Where(g => codeList.Contains(g.Code));
+
+        var genres = await query.ToListAsync();
+
+        if(genres.Count() != codeList.Count())
             throw new ResourceNotFoundException();
         
         return genres;

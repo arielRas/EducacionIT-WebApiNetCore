@@ -76,10 +76,7 @@ public class BookRepository : IBookRepository
     }    
 
     public async Task CreateAsync(Book book)
-    {
-        await _dbset.AddAsync(book);
-        await _context.SaveChangesAsync();       
-    }
+        => await _dbset.AddAsync(book); 
 
     public async Task UpdateAsync(int id, Book book)
     {
