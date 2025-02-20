@@ -21,12 +21,6 @@ public class BookRepository : IBookRepository
 
     public async Task<Book> GetByIdAsync(int id)
     {
-        return await _dbset.FindAsync(id) 
-            ?? throw new ResourceNotFoundException($"The book with ID: {id} has not been found");
-    }
-
-    public async Task<Book> GetByIdWithRelationshipsAsync(int id)
-    {
         return await _dbset.Include(b => b.Authors)
                            .Include(b => b.Genres)
                            .Include(b => b.Editions)                           
@@ -45,7 +39,7 @@ public class BookRepository : IBookRepository
         return books;
     }
 
-    public async Task<IEnumerable<Book>> GetAllFilteredByTitleOrAuthorAsync(string filter)
+    public async Task<IEnumerable<Book>> GetFilteredByTitleOrAuthorAsync(string filter)
     {
         IQueryable<Book> query = _dbset.AsQueryable();
 
@@ -86,7 +80,44 @@ public class BookRepository : IBookRepository
         _context.Entry(existingEntity).CurrentValues.SetValues(book);
 
         await _context.SaveChangesAsync();
+    }    
+
+
+    public async Task UpdateGenresAsync(int bookId, IEnumerable<Genre> genres)
+    {
+        var book = await _dbset.Include(b => b.Genres)
+                               .FirstOrDefaultAsync(b => b.BookId == bookId)
+                               ?? throw new ResourceNotFoundException($"The book with ID: {bookId} has not been found");
+
+        foreach (var genre in book.Genres.Except(genres))
+        {
+            book.Genres.Remove(genre);
+        }
+
+        foreach (var genre in genres.Except(book.Genres))
+        {
+            book.Genres.Add(genre);
+        }
     }
+
+
+    public async Task UpdateAuthorsAsync(int bookId, IEnumerable<Author> authors)
+    {
+        var book = await _dbset.Include(b => b.Authors)
+                               .FirstOrDefaultAsync(b => b.BookId == bookId)
+                               ?? throw new ResourceNotFoundException($"The book with ID: {bookId} has not been found");
+
+        foreach(var author in book.Authors.Except(authors))
+        {
+            book.Authors.Remove(author);
+        }
+
+        foreach(var author in authors.Except(book.Authors))
+        {
+            book.Authors.Add(author);
+        }
+    }
+
 
     public async Task DeleteAsync(int id)
     {
@@ -96,5 +127,5 @@ public class BookRepository : IBookRepository
         _dbset.Remove(existingEntity);
 
         await _context.SaveChangesAsync();
-    }    
+    }
 }

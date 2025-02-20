@@ -11,7 +11,7 @@ using BookStore.Services.Mappers;
 namespace BookStore.Services.Implementations;
 
 public class BookService : IBookService
-{   
+{
     private readonly IBookRepository _repository;
     private readonly IBookUnitOfWork _unitOfWork;
 
@@ -26,13 +26,13 @@ public class BookService : IBookService
     {
         try
         {
-            return (await _repository.GetByIdWithRelationshipsAsync(id)).ToResponseDto();
+            return (await _repository.GetByIdAsync(id)).ToResponseDto();
         }
-        catch(ResourceNotFoundException) 
+        catch (ResourceNotFoundException)
         {
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -44,11 +44,11 @@ public class BookService : IBookService
         {
             return (await _repository.GetAllAsync()).Select(b => b.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch (ResourceNotFoundException)
         {
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -60,15 +60,15 @@ public class BookService : IBookService
         {
             filter = filter.ToLower().Trim();
 
-            var books = await _repository.GetAllFilteredByTitleOrAuthorAsync(filter);
+            var books = await _repository.GetFilteredByTitleOrAuthorAsync(filter);
 
             return books.Select(b => b.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch (ResourceNotFoundException)
         {
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -77,20 +77,20 @@ public class BookService : IBookService
     public async Task<BookDto> CreateAsync(BookRequestDto book)
     {
         try
-        {            
+        {
             var authors = await _unitOfWork.AuthorRepository.GetByIdsAsync(book.AuthorsId);
 
-            var validation = ValidateCollections(book.AuthorsId, authors.Select(a => a.AuthorId));
+            var resultValidation = ValidateCollections(book.AuthorsId, authors.Select(a => a.AuthorId));
 
-            if (!validation.IsValid)
-                throw new ResourceNotFoundException(validation.ErrorMessage);
+            if (!resultValidation.IsValid)
+                throw new ResourceNotFoundException(resultValidation.ErrorMessage);
 
             var genres = await _unitOfWork.GenreRepository.GetByCodesAsync(book.Genres);
 
-            validation = ValidateCollections(book.Genres, genres.Select(g => g.Code));
+            resultValidation = ValidateCollections(book.Genres, genres.Select(g => g.Code));
 
-            if (!validation.IsValid)
-                throw new ResourceNotFoundException(validation.ErrorMessage);
+            if (!resultValidation.IsValid)
+                throw new ResourceNotFoundException(resultValidation.ErrorMessage);
 
             var bookDao = book.ToCreateDao(authors, genres);
 
@@ -100,12 +100,12 @@ public class BookService : IBookService
 
             return bookDao.ToDto();
         }
-        catch(ResourceNotFoundException) 
+        catch (ResourceNotFoundException)
         {
             _unitOfWork.Dispose();
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             _unitOfWork.Dispose();
             throw;
@@ -122,41 +122,101 @@ public class BookService : IBookService
 
             throw new NotImplementedException();
         }
-        catch(ResourceNotFoundException) 
+        catch (ResourceNotFoundException)
         {
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
     }
-    
+
+
+    public async Task UpdateGenresAsync(int bookId, IEnumerable<string> authorIds)
+    {
+        try
+        {
+            authorIds = authorIds.Distinct().ToList();
+
+            var genres = await _unitOfWork.GenreRepository.GetByCodesAsync(authorIds);
+
+            var resultValidation = ValidateCollections(authorIds, genres.Select(g => g.Code));
+
+            if (!resultValidation.IsValid)
+                throw new ResourceNotFoundException(resultValidation.ErrorMessage);
+
+            await _unitOfWork.BookRepository.UpdateGenresAsync(bookId, genres);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+        catch (ResourceNotFoundException)
+        {
+            _unitOfWork.Dispose();
+            throw;
+        }
+        catch (Exception)
+        {
+            _unitOfWork.Dispose();
+            throw;
+        }
+    }
+
+    public async Task UpdateAuthorsAsync(int bookId, IEnumerable<int> authorIds)
+    {
+        try
+        {
+            authorIds = authorIds.Distinct().ToList();
+
+            var authors = await _unitOfWork.AuthorRepository.GetByIdsAsync(authorIds);
+
+            var resultValidation = ValidateCollections(authorIds, authors.Select(a => a.AuthorId));
+
+            if (!resultValidation.IsValid)
+                throw new ResourceNotFoundException(resultValidation.ErrorMessage);
+
+            await _unitOfWork.BookRepository.UpdateAuthorsAsync(bookId, authors);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+        catch (ResourceNotFoundException)
+        {
+            _unitOfWork.Dispose();
+            throw;
+        }
+        catch (Exception)
+        {
+            _unitOfWork.Dispose();
+            throw;
+        }
+    }
+
+
     public async Task DeleteAsync(int id)
     {
         try
         {
             await _repository.DeleteAsync(id);
         }
-        catch(ResourceNotFoundException) 
+        catch (ResourceNotFoundException)
         {
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
     }
 
-    private ResultValidation ValidateCollections<T>(IEnumerable<T> dtoList,  IEnumerable<T> daoList)
+    private ResultValidation ValidateCollections<T>(IEnumerable<T> dtoList, IEnumerable<T> daoList)
     {
         var nonExistingElements = dtoList.Except(daoList);
 
-        if(!nonExistingElements.Any()) 
+        if (!nonExistingElements.Any())
             return new ResultValidation();
 
         string errorMessage = string.Join(", ", nonExistingElements.Select(e => e!.ToString()));
 
-        return new ResultValidation($"Resources with {errorMessage} do not exist");        
+        return new ResultValidation($"Resources with {errorMessage} do not exist");
     }
 }
