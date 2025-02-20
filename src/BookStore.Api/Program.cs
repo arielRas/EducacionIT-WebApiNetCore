@@ -2,6 +2,8 @@
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.Repository.Repositories;
+using BookStore.Data.UnitOfWork.Implementation;
+using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.Implementations;
 using BookStore.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,7 @@ namespace BookStore.Api
             builder.Services.AddScoped<IAuthorService, AuthorService>();
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<IBookService, BookService>();
+            builder.Services.AddScoped<IBookUnitOfWork, BookUnitOfWork>();
 
 
             // Add services to the container.

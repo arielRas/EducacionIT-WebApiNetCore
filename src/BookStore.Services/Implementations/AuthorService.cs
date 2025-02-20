@@ -18,7 +18,7 @@ public class AuthorService : IAuthorService
     {        
         try
         {
-            var author = await _repository.GetByIdWithRelationshipsAsync(id);
+            var author = await _repository.GetByIdAsync(id);
             
             return author.ToResponseDto();
         }

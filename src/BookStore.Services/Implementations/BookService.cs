@@ -78,14 +78,14 @@ public class BookService : IBookService
     {
         try
         {            
-            var authors = await _unitOfWork.AuthorRepository.GetAllFilteredByIdAsync(book.AuthorsId);
+            var authors = await _unitOfWork.AuthorRepository.GetByIdsAsync(book.AuthorsId);
 
             var validation = ValidateCollections(book.AuthorsId, authors.Select(a => a.AuthorId));
 
             if (!validation.IsValid)
                 throw new ResourceNotFoundException(validation.ErrorMessage);
 
-            var genres = await _unitOfWork.GenreRepository.GetAllFilteredByCodeAsync(book.Genres);
+            var genres = await _unitOfWork.GenreRepository.GetByCodesAsync(book.Genres);
 
             validation = ValidateCollections(book.Genres, genres.Select(g => g.Code));
 

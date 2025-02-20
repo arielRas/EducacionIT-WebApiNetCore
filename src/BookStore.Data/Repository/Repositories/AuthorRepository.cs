@@ -21,40 +21,31 @@ public class AuthorRepository : IAuthorRepository
 
     public async Task<Author> GetByIdAsync(int id)
     {
-        return await _dbSet.FindAsync(id) 
-            ?? throw new ResourceNotFoundException($"The author with ID: {id} has not been found");
-    }
-
-    public async Task<Author> GetByIdWithRelationshipsAsync(int id)
-    {
         return await _dbSet.Include(a => a.Books)
                            .FirstOrDefaultAsync(a => a.AuthorId == id)
                            ?? throw new ResourceNotFoundException($"The author with ID: {id} has not been found");
     }
+
+    public async Task<IEnumerable<Author>> GetByIdsAsync(IEnumerable<int> idList)
+    {
+        var query = _dbSet.AsQueryable();
+
+        query = query.Where(a => idList.Contains(a.AuthorId));
+
+        return await query.ToListAsync();
+    }
+
 
     public async Task<IEnumerable<Author>> GetAllAsync()
     {
         var authors = await _dbSet.ToListAsync();
 
         if(!authors.Any()) 
-            throw new ResourceNotFoundException($"There are no authors to display");
+            throw new ResourceNotFoundException("There are no authors to display");
 
         return authors;
     }
-
-    public async Task<IEnumerable<Author>> GetAllFilteredByIdAsync(IEnumerable<int> idList)
-    {
-        var query = _dbSet.AsQueryable();
-
-        query = query.AsNoTracking().Where(a => idList.Contains(a.AuthorId));
-
-        var authors = await query.ToListAsync();
-
-        if(!authors.Any()) 
-            throw new ResourceNotFoundException();
-
-        return authors;
-    }
+    
 
     public async Task<IEnumerable<Author>> GetAllFilteredAsync(string filter)
     {
@@ -64,16 +55,19 @@ public class AuthorRepository : IAuthorRepository
 
         var authors = await query.ToListAsync();
 
-        if(!authors.Any()) throw new ResourceNotFoundException($"There are no authors to display");
+        if (!authors.Any())
+            throw new ResourceNotFoundException("There are no authors to display");
 
         return authors;
     }
 
+
     public async Task CreateAsync(Author author)
     {
         await _dbSet.AddAsync(author);
-        await SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
+
 
     public async Task UpdateAsync(int id, Author author)
     {
@@ -82,8 +76,9 @@ public class AuthorRepository : IAuthorRepository
 
         _context.Entry(existingEntity).CurrentValues.SetValues(author);
 
-        await SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
+
 
     public async Task DeleteAsync(int id)
     {
@@ -92,9 +87,6 @@ public class AuthorRepository : IAuthorRepository
 
         _dbSet.Remove(existingEntity);
 
-        await SaveChangesAsync();
-    }   
-
-    private async Task SaveChangesAsync()
-        => await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
+    } 
 }

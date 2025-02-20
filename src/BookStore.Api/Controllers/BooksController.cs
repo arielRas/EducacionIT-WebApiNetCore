@@ -111,7 +111,11 @@ public class BooksController : ControllerBase
             return CreatedAtAction(nameof(GetById), new {Id = book.Id}, newBook);
             
         }
-        catch(Exception ex)
+        catch (ResourceNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
