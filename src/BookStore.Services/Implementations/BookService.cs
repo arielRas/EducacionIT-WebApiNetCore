@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
 using BookStore.Data.Repository.Interfaces;

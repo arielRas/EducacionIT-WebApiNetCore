@@ -28,8 +28,7 @@ internal static class EditionMapper
             PublicationDate = dao.PublicationDate,
             Pages = dao.Pages,
             Language = dao.Language,
-            TypeCode = dao.EditionType.Code,
-            Editorial = dao.Editorial.Name
+            TypeCode = dao.EditionType.Code
         };
     }
 
