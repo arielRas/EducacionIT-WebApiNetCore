@@ -50,7 +50,7 @@ public partial class BookStoreDbContext : DbContext
                         .HasConstraintName("FK_BOOK_AUTHOR_AUTHOR"),
                     l => l.HasOne<Book>().WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .HasConstraintName("FK_BOOK_AUTHOR_BOOK"),
                     j =>
                     {

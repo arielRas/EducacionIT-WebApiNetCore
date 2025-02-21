@@ -203,17 +203,24 @@ public class BookService : IBookService
     {
         try
         {
-            await _repository.DeleteAsync(id);
+            await _unitOfWork.BeginTransactionAsync();
+
+            await _unitOfWork.BookRepository.DeleteAsync(id);
+
+            await _unitOfWork.CommitTransactionAsync();
         }
         catch (ResourceNotFoundException)
         {
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
         catch (Exception)
         {
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
     }
+
 
     private ResultValidation ValidateCollections<T>(IEnumerable<T> dtoList, IEnumerable<T> daoList)
     {

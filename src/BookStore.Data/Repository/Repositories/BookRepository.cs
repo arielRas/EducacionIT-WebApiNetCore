@@ -121,11 +121,11 @@ public class BookRepository : IBookRepository
 
     public async Task DeleteAsync(int id)
     {
-        var existingEntity = await _dbset.FindAsync(id)
-            ?? throw new ResourceNotFoundException($"The book with ID: {id} has not been found");
+        var existingEntity = await _dbset.Include(b => b.Genres)
+                                         .Include(b => b.Authors)
+                                         .FirstOrDefaultAsync(b => b.BookId == id)
+                                         ?? throw new ResourceNotFoundException($"The book with ID: {id} has not been found");
 
         _dbset.Remove(existingEntity);
-
-        await _context.SaveChangesAsync();
     }
 }
