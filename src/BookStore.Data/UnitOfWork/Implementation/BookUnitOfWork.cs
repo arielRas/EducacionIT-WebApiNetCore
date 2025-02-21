@@ -1,17 +1,21 @@
 using System;
+using System.Transactions;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.Repository.Repositories;
 using BookStore.Data.UnitOfWork.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BookStore.Data.UnitOfWork.Implementation;
 
 public class BookUnitOfWork : IBookUnitOfWork
 {
-    private  readonly BookStoreDbContext _context;
-    private  IBookRepository? _bookRepository;
-    private  IGenreRepository? _genreRepository;
-    private  IAuthorRepository? _authorRepository;
+    private readonly BookStoreDbContext _context;
+    private IBookRepository? _bookRepository;
+    private IGenreRepository? _genreRepository;
+    private IAuthorRepository? _authorRepository;
+    private IDbContextTransaction? _transaction;
 
     public BookUnitOfWork(BookStoreDbContext context)
         => _context = context;
@@ -25,9 +29,28 @@ public class BookUnitOfWork : IBookUnitOfWork
     public IAuthorRepository AuthorRepository 
         => _authorRepository ??= new AuthorRepository(_context);
 
-    public void Dispose()
-        => _context.Dispose();
+    public async Task BeginTransactionAsync()
+        => _transaction ??= await _context.Database.BeginTransactionAsync();
 
-    public async Task SaveChangesAsync()
-        => await _context.SaveChangesAsync();
+    public async Task CommitTransactionAsync()
+    {
+        if(IsTransactionActive())
+        {
+            await _context.SaveChangesAsync();
+            await _transaction!.CommitAsync();           
+        }            
+    }
+
+    public async Task RollbackTransactionAsync()
+    {
+        if(IsTransactionActive())
+        {
+            await _transaction!.RollbackAsync();
+            _transaction?.Dispose();
+            _transaction = null;
+        }            
+    }
+
+    private bool IsTransactionActive()
+        => _transaction is not null && _transaction.GetDbTransaction().Connection is not null;
 }

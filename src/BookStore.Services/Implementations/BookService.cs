@@ -38,6 +38,7 @@ public class BookService : IBookService
         }
     }
 
+
     public async Task<IEnumerable<BookDto>> GetAllAsync()
     {
         try
@@ -53,6 +54,7 @@ public class BookService : IBookService
             throw;
         }
     }
+
 
     public async Task<IEnumerable<BookDto>> GetAllFilteredAsync(string filter)
     {
@@ -74,6 +76,7 @@ public class BookService : IBookService
         }
     }
 
+
     public async Task<BookDto> CreateAsync(BookRequestDto book)
     {
         try
@@ -94,23 +97,26 @@ public class BookService : IBookService
 
             var bookDao = book.ToCreateDao(authors, genres);
 
+            await _unitOfWork.BeginTransactionAsync();
+
             await _unitOfWork.BookRepository.CreateAsync(bookDao);
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
 
             return bookDao.ToDto();
         }
         catch (ResourceNotFoundException)
         {
-            _unitOfWork.Dispose();
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
         catch (Exception)
         {
-            _unitOfWork.Dispose();
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
-        }
+        }     
     }
+
 
     public async Task UpdateAsync(int id, BookDto book)
     {
@@ -146,47 +152,50 @@ public class BookService : IBookService
             if (!resultValidation.IsValid)
                 throw new ResourceNotFoundException(resultValidation.ErrorMessage);
 
+            await _unitOfWork.BeginTransactionAsync();
+
             await _unitOfWork.BookRepository.UpdateGenresAsync(bookId, genres);
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
         }
         catch (ResourceNotFoundException)
         {
-            _unitOfWork.Dispose();
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
         catch (Exception)
         {
-            _unitOfWork.Dispose();
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
     }
 
+
     public async Task UpdateAuthorsAsync(int bookId, IEnumerable<int> authorIds)
     {
         try
-        {
-            authorIds = authorIds.Distinct().ToList();
-
+        {  
             var authors = await _unitOfWork.AuthorRepository.GetByIdsAsync(authorIds);
 
             var resultValidation = ValidateCollections(authorIds, authors.Select(a => a.AuthorId));
 
             if (!resultValidation.IsValid)
                 throw new ResourceNotFoundException(resultValidation.ErrorMessage);
+            
+            await _unitOfWork.BeginTransactionAsync();
 
             await _unitOfWork.BookRepository.UpdateAuthorsAsync(bookId, authors);
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
         }
         catch (ResourceNotFoundException)
         {
-            _unitOfWork.Dispose();
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
         catch (Exception)
         {
-            _unitOfWork.Dispose();
+            await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
     }

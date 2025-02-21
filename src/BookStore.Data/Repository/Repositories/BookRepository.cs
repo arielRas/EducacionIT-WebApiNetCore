@@ -87,9 +87,9 @@ public class BookRepository : IBookRepository
     {
         var book = await _dbset.Include(b => b.Genres)
                                .FirstOrDefaultAsync(b => b.BookId == bookId)
-                               ?? throw new ResourceNotFoundException($"The book with ID: {bookId} has not been found");
+                               ?? throw new ResourceNotFoundException($"The book with ID: {bookId} has not been found");        
 
-        foreach (var genre in book.Genres.Except(genres))
+        foreach (var genre in book.Genres.Except(genres).ToList())
         {
             book.Genres.Remove(genre);
         }
@@ -97,7 +97,7 @@ public class BookRepository : IBookRepository
         foreach (var genre in genres.Except(book.Genres))
         {
             book.Genres.Add(genre);
-        }
+        }     
     }
 
 
