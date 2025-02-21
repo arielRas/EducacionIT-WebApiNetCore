@@ -70,7 +70,7 @@ public class BooksController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<BookDto>>> GetAll([FromRoute] string filter)
+    public async Task<ActionResult<IEnumerable<BookDto>>> GetAllFiltered([FromRoute] string filter)
     {
         try
         { 
