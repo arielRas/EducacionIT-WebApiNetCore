@@ -143,8 +143,6 @@ public class BookService : IBookService
     {
         try
         {
-            authorIds = authorIds.Distinct().ToList();
-
             var genres = await _unitOfWork.GenreRepository.GetByCodesAsync(authorIds);
 
             var resultValidation = ValidateCollections(authorIds, genres.Select(g => g.Code));

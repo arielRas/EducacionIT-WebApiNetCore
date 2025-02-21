@@ -182,6 +182,42 @@ public class BooksController : ControllerBase
     }
 
 
+    [HttpPatch("{id:int}/Authors/Update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateBookAuthors([FromRoute] int id, [FromBody] List<int> authorsids)
+    {
+        try
+        {
+            if(id <= 0)
+                return BadRequest("The id must be a number greater than zero");
+
+            if(!authorsids.Any())
+                return BadRequest("The code list cannot be empty");
+
+            if(authorsids.Count != authorsids.Distinct().ToList().Count)
+                return BadRequest("The code list cannot have repeated elements");
+            
+            if(authorsids.Any(id => id <= 0))
+                return BadRequest("None of the Id's can be zero");
+            
+            await _service.UpdateAuthorsAsync(id, authorsids);           
+        
+            return NoContent();
+        }
+        catch(ResourceNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch(Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

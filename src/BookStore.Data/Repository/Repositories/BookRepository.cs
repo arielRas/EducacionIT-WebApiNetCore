@@ -107,7 +107,7 @@ public class BookRepository : IBookRepository
                                .FirstOrDefaultAsync(b => b.BookId == bookId)
                                ?? throw new ResourceNotFoundException($"The book with ID: {bookId} has not been found");
 
-        foreach(var author in book.Authors.Except(authors))
+        foreach(var author in book.Authors.Except(authors).ToList())
         {
             book.Authors.Remove(author);
         }
