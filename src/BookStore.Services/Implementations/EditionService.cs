@@ -83,11 +83,11 @@ public class EditionService : IEditionService
     }
 
 
-    public async Task<EditionDto> CreateAsync(EditionRequestDto edition)
+    public async Task<EditionDto> CreateAsync(EditionRequestCreateDto edition)
     {
         try
         {
-            var validationResult = EditionValidator.Validate(edition);
+            var validationResult = edition.Validate();
 
             if(!validationResult.IsValid)
                 throw new BusinessException(validationResult.ErrorMessage);
@@ -131,13 +131,34 @@ public class EditionService : IEditionService
     }
 
 
-    public Task UpdateAsync(Guid id, EditionDto edition)
+    public async Task UpdateAsync(Guid id, EditionRequestUpdateDto edition)
     {
-        throw new NotImplementedException();
+        try 
+        {
+            var resultValidation = edition.Validate();
+
+            if(!resultValidation.IsValid)
+                throw new BusinessException(resultValidation.ErrorMessage);
+
+            resultValidation = await ValidateRelationships(edition);
+
+            if (!resultValidation.IsValid)
+                throw new BusinessException(resultValidation.ErrorMessage);
+
+            await _unitOfWork.EditionRepository.UpdateAsync(id, edition.ToDao());
+        }
+        catch (BusinessException) 
+        {
+            throw;
+        }
+        catch (Exception) 
+        {
+            throw;
+        }
     }
 
 
-    public Task UpdateEditionEditorialAsync(Guid id, int editorialId)
+    public Task UpdateIsbnAsync(Guid id, string isbn)
     {
         throw new NotImplementedException();
     }
@@ -154,7 +175,7 @@ public class EditionService : IEditionService
         throw new NotImplementedException();
     }
 
-    private async Task<ResultValidation> ValidateRelationships(EditionRequestDto dto)
+    private async Task<ResultValidation> ValidateRelationships(EditionRequestUpdateDto dto)
     {
         var existBook = await _unitOfWork.BookRepository.Exist(dto.BookId);
         
@@ -186,5 +207,5 @@ public class EditionService : IEditionService
             Code = isbnCode,
             Edition = edition
         };
-    }
+    }    
 }

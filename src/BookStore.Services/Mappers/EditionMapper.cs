@@ -6,7 +6,7 @@ namespace BookStore.Services.Mappers;
 
 internal static class EditionMapper
 {
-    public static Edition ToDao(this EditionRequestDto dto)
+    public static Edition ToDao(this EditionRequestUpdateDto dto)
     {
         return new Edition
         {

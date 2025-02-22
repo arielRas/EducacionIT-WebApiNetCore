@@ -8,9 +8,9 @@ public interface IEditionService
     Task<EditionDto> GetByIdAsync(Guid id);    
     Task<IEnumerable<EditionDto>> GetAllAsync();
     Task<IEnumerable<EditionDto>> GetByBookTitle(string bookTitle);
-    Task<EditionDto> CreateAsync(EditionRequestDto edition);
-    Task UpdateAsync(Guid id, EditionDto edition);
+    Task<EditionDto> CreateAsync(EditionRequestCreateDto edition);
+    Task UpdateAsync(Guid id, EditionRequestUpdateDto edition);
     Task UpdateEditionPriceAsync(Guid id, decimal price);
-    Task UpdateEditionEditorialAsync(Guid id, int editorialId);
+    Task UpdateIsbnAsync(Guid id, string isbn);
     Task DeleteAsync(Guid id);
 }
