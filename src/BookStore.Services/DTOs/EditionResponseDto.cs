@@ -8,12 +8,16 @@ public record class EditionResponseDto : EditionDto
     [JsonPropertyOrder(5)]
     public string? Isbn { get; set; } 
 
-    
     [JsonPropertyOrder(6)]
-    public string? Editorial { get; set; }     
+    [Required] 
+    public required string Book { get; set; } 
 
-    [Required]
     [JsonPropertyOrder(7)]
+    [Required]    
+    public required string Editorial { get; set; }  
+
+    [JsonPropertyOrder(8)]
+    [Required]    
     [DataType(DataType.Currency)]
     public decimal Price { get; set; }
 }

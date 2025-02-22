@@ -5,5 +5,5 @@ namespace BookStore.Data.Repository.Interfaces;
 
 public interface IEditorialRepository : IRepository<Editorial>
 {
-
+    Task<bool> Exist(int id);
 }

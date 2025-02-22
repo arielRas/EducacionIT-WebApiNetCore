@@ -13,6 +13,8 @@ public class EditionUnitOfWork : IEditionUnitOfWork
     private IEditionRepository? _editionRepository;
     private IEditionPriceRepository? _editionPriceRepository;
     private IIsbnRepository? _isbnRepository;
+    private IBookRepository? _bookRepository;
+    private IEditorialRepository? _ditorialRepository;
     private IDbContextTransaction? _transaction;
 
     public EditionUnitOfWork(BookStoreDbContext context)
@@ -26,6 +28,12 @@ public class EditionUnitOfWork : IEditionUnitOfWork
 
     public IIsbnRepository IsbnRepository 
         => _isbnRepository ??= new IsbnRepository(_context);
+
+    public IBookRepository BookRepository
+        => _bookRepository ??= new BookRepository(_context);
+
+    public IEditorialRepository EditorialRepository
+        => _ditorialRepository ??= new EditorialRepository(_context);
 
     public async Task BeginTransactionAsync()
         => _transaction ??= await _context.Database.BeginTransactionAsync();

@@ -21,7 +21,8 @@ public class EditionRepository : IEditionRepository
     
     public async Task<Edition> GetByIdAsync(Guid id)
     {
-        return await _dbset.Include(e => e.Isbn)
+        return await _dbset.Include(e => e.Book)
+                           .Include(e => e.Isbn)
                            .Include(e => e.Editorial)
                            .Include(e => e.EditionType)
                            .Include(e => e.EditionPrice)
@@ -31,8 +32,7 @@ public class EditionRepository : IEditionRepository
 
     public async Task<IEnumerable<Edition>> GetAllAsync()
     {
-        var editions = await _dbset.Include(e => e.Isbn)
-                                   .Include(e => e.Editorial)
+        var editions = await _dbset.Include(e => e.Editorial)
                                    .Include(e => e.EditionType)
                                    .ToListAsync();
         
@@ -46,9 +46,7 @@ public class EditionRepository : IEditionRepository
     {
         IQueryable<Edition> query = _dbset.AsQueryable();
 
-        query = query.Include(e => e.Isbn)
-                     .Include(e => e.Editorial)
-                     .Include(e => e.EditionType)
+        query = query.Include(e => e.EditionType)
                      .Where(filter);
 
         var editions = await query.ToListAsync();

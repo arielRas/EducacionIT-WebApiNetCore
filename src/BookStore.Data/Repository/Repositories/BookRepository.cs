@@ -128,4 +128,8 @@ public class BookRepository : IBookRepository
 
         _dbset.Remove(existingEntity);
     }
+
+
+    public async Task<bool> Exist(int id)
+        => await _dbset.AnyAsync(e => e.BookId == id);
 }

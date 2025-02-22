@@ -15,4 +15,5 @@ public interface IBookRepository
     Task UpdateGenresAsync(int bookId, IEnumerable<Genre> genres);
     Task UpdateAuthorsAsync(int bookId, IEnumerable<Author> authors);
     Task DeleteAsync(int id);
+    Task<bool> Exist(int id);
 }

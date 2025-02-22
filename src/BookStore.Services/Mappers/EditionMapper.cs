@@ -40,6 +40,7 @@ internal static class EditionMapper
             PublicationDate = dao.PublicationDate,
             Pages = dao.Pages,
             Language = dao.Language,
+            Book = dao.Book.Title,
             TypeCode = dao.EditionType.Code,
             Editorial = dao.Editorial.Name,
             Isbn = dao.Isbn?.Code,

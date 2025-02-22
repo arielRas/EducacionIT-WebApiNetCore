@@ -7,5 +7,7 @@ public interface IEditionUnitOfWork : IUnitOfWork
 {
     IEditionRepository EditionRepository {get;}
     IEditionPriceRepository EditionPriceRepository {get;}
-    IIsbnRepository IsbnRepository{get;}
+    IIsbnRepository IsbnRepository {get;}
+    IBookRepository BookRepository {get;}
+    IEditorialRepository EditorialRepository {get;}
 }
