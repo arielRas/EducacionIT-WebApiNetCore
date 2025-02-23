@@ -50,7 +50,6 @@ public partial class BookStoreDbContext : DbContext
                         .HasConstraintName("FK_BOOK_AUTHOR_AUTHOR"),
                     l => l.HasOne<Book>().WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
                         .HasConstraintName("FK_BOOK_AUTHOR_BOOK"),
                     j =>
                     {
@@ -69,7 +68,6 @@ public partial class BookStoreDbContext : DbContext
                         .HasConstraintName("FK_BOOK_GENRE_GENRE"),
                     l => l.HasOne<Book>().WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
                         .HasConstraintName("FK_BOOK_GENRE_BOOK"),
                     j =>
                     {
@@ -108,23 +106,17 @@ public partial class BookStoreDbContext : DbContext
 
             entity.Property(e => e.EditionId).ValueGeneratedNever();
 
-            entity.HasOne(d => d.Edition).WithOne(p => p.EditionPrice)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("PK_EDITION_PRICE_EDITION");
+            entity.HasOne(d => d.Edition).WithOne(p => p.EditionPrice).HasConstraintName("PK_EDITION_PRICE_EDITION");
         });
 
         modelBuilder.Entity<HistoryPrice>(entity =>
         {
-            entity.HasOne(d => d.Edition).WithMany(p => p.HistoryPrice)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("PK_HISTORY_PRICE_EDITION");
+            entity.HasOne(d => d.Edition).WithMany(p => p.HistoryPrice).HasConstraintName("PK_HISTORY_PRICE_EDITION");
         });
 
         modelBuilder.Entity<Isbn>(entity =>
         {
-            entity.HasOne(d => d.Edition).WithOne(p => p.Isbn)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("PK_ISBN_EDITION");
+            entity.HasOne(d => d.Edition).WithOne(p => p.Isbn).HasConstraintName("FK_ISBN_EDITION");
         });
 
         OnModelCreatingPartial(modelBuilder);
