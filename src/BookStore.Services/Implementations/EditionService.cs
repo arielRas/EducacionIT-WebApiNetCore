@@ -99,13 +99,11 @@ public class EditionService : IEditionService
 
             var editionDao = edition.ToDao();
 
-            var editionPriceDao = CreateEditionPrice(editionDao, edition.Price);
-
             await _unitOfWork.BeginTransactionAsync();
 
             await _unitOfWork.EditionRepository.CreateAsync(editionDao);
 
-            await _unitOfWork.EditionPriceRepository.CreateAsync(editionPriceDao);
+            await _unitOfWork.EditionPriceRepository.CreateAsync(CreateEditionPrice(editionDao, edition.Price));
 
             if(edition.Isbn is not null)
                 await _unitOfWork.IsbnRepository.CreateAsync(CreateIsbn(editionDao, edition.Isbn));
@@ -158,21 +156,63 @@ public class EditionService : IEditionService
     }
 
 
-    public Task UpdateIsbnAsync(Guid id, string isbn)
+    public async Task UpdateIsbnAsync(Guid id, string isbn)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _unitOfWork.IsbnRepository.UpdateByEditionIdAsync(id, isbn);
+
+        }
+        catch(ResourceNotFoundException)
+        {
+            throw;
+        }
+        catch(Exception)
+        {
+            throw;
+        }
     }
 
 
-    public Task UpdateEditionPriceAsync(Guid id, decimal price)
+    public async Task UpdateEditionPriceAsync(Guid id, decimal price)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _unitOfWork.EditionPriceRepository.UpdateAsync(id, price);
+                        
+        }
+        catch(ResourceNotFoundException)
+        {
+            throw;
+        }
+        catch(Exception)
+        {
+            throw;
+        }
     }
 
 
-    public Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync();
+
+            await _unitOfWork.EditionRepository.DeleteAsync(id);
+
+            await _unitOfWork.CommitTransactionAsync();
+                        
+        }
+        catch(ResourceNotFoundException)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+        catch(Exception)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     private async Task<ResultValidation> ValidateRelationships(EditionRequestUpdateDto dto)

@@ -23,8 +23,37 @@ public class IsbnRepository : IIsbnRepository
             ?? throw new ResourceNotFoundException($"The edition with ISBN {code} does not exist");
     }
 
+    public async Task<Isbn> GetByEditionIdAsync(Guid id)
+    {
+        var isbn = await _dbSet.FirstAsync(i => i.EditionId == id)
+            ?? throw new ResourceNotFoundException($"There is no ISBN for edition {id}");
+        
+        return isbn;
+    }
+
     public async Task CreateAsync(Isbn isbn)
         => await _dbSet.AddAsync(isbn);
+
+
+    public async Task UpdateAsync(string code, string newCode)
+    {
+        var isbn = await _dbSet.FindAsync(code) 
+            ?? throw new ResourceNotFoundException($"The edition with ISBN {code} does not exist");
+        
+        isbn.Code = newCode;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateByEditionIdAsync(Guid id, string newCode)
+    {
+        var isbn = await _dbSet.FirstAsync(i => i.EditionId == id)
+            ?? throw new ResourceNotFoundException($"There is no ISBN for edition {id}");
+        
+        isbn.Code = newCode;
+
+        await _context.SaveChangesAsync();
+    }
 
     public async Task DeleteAsync(string code)
     {
@@ -32,15 +61,5 @@ public class IsbnRepository : IIsbnRepository
             ?? throw new ResourceNotFoundException($"The edition with ISBN {code} does not exist");
 
         _dbSet.Remove(existingEntity);
-    }  
-
-    public async Task UpdateAsync(string code, Isbn isbn)
-    {
-        var existingEntity = await _dbSet.FindAsync(code) 
-            ?? throw new ResourceNotFoundException($"The edition with ISBN {code} does not exist");
-        
-        _context.Entry(existingEntity).CurrentValues.SetValues(isbn);
-
-        await _context.SaveChangesAsync();
-    }
+    }      
 }
