@@ -133,6 +133,8 @@ public class EditionService : IEditionService
     {
         try 
         {
+            edition.Id = id;
+
             var resultValidation = edition.Validate();
 
             if(!resultValidation.IsValid)
@@ -146,6 +148,10 @@ public class EditionService : IEditionService
             await _unitOfWork.EditionRepository.UpdateAsync(id, edition.ToDao());
         }
         catch (BusinessException) 
+        {
+            throw;
+        }
+        catch(ResourceNotFoundException)
         {
             throw;
         }
