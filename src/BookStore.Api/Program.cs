@@ -1,4 +1,6 @@
 
+using BookStore.Api.DependencyInjection;
+
 namespace BookStore.Api
 {
     public class Program
@@ -7,12 +9,13 @@ namespace BookStore.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            //Servicos de la app
+            builder.Services.AddAplicactionServices(builder.Configuration)
+                            .AddControllers();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen();// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
             var app = builder.Build();
 
@@ -26,7 +29,6 @@ namespace BookStore.Api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
