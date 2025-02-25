@@ -23,18 +23,13 @@ public class GenreRepository : IGenreRepository
             ?? throw new ResourceNotFoundException($"The genre with code: {code} has not been found");
     }
 
+
     public async Task<IEnumerable<Genre>> GetAllAsync()
         => await _dbSet.ToListAsync();
 
 
     public async Task<IEnumerable<Genre>> GetByCodesAsync(IEnumerable<string> codeList)
-    {
-        var query = _dbSet.AsQueryable();
-
-        query = query.Where(g => codeList.Contains(g.Code));
-
-        return await query.ToListAsync();
-    }
+        => await _dbSet.Where(g => codeList.Contains(g.Code)).ToListAsync();
 
 
     public async Task CreateAsync(Genre genre)
@@ -61,5 +56,5 @@ public class GenreRepository : IGenreRepository
         _dbSet.Remove(existingEntity);
 
         await _context.SaveChangesAsync();
-    }    
+    }
 }

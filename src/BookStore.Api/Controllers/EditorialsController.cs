@@ -20,7 +20,7 @@ public class EditorialsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<EditorialDto>> GetByCode([FromRoute] int id)
+    public async Task<ActionResult<EditorialDto>> GetById([FromRoute] int id)
     {
         try
         {
@@ -80,7 +80,7 @@ public class EditorialsController : ControllerBase
 
             editorial = await _service.CreateAsync(editorial);
 
-            return CreatedAtAction(nameof(GetByCode), new { code = editorial.Id }, editorial);
+            return CreatedAtAction(nameof(GetById), new { Id = editorial.Id }, editorial);
         }
         catch (Exception ex)
         {

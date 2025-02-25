@@ -66,6 +66,8 @@ public class EditorialService : IEditorialService
     {
         try
         {
+            editorial.Id = id;
+
             await _repository.UpdateAsync(id, editorial.ToDao());
         }
         catch(ResourceNotFoundException) 

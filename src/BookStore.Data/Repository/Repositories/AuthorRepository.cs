@@ -26,14 +26,9 @@ public class AuthorRepository : IAuthorRepository
                            ?? throw new ResourceNotFoundException($"The author with ID: {id} has not been found");
     }
 
+       
     public async Task<IEnumerable<Author>> GetByIdsAsync(IEnumerable<int> idList)
-    {
-        var query = _dbSet.AsQueryable();
-
-        query = query.Where(a => idList.Contains(a.AuthorId));
-
-        return await query.ToListAsync();
-    }
+        => await _dbSet.Where(a => idList.Contains(a.AuthorId)).ToListAsync();
 
 
     public async Task<IEnumerable<Author>> GetAllAsync()
@@ -88,5 +83,5 @@ public class AuthorRepository : IAuthorRepository
         _dbSet.Remove(existingEntity);
 
         await _context.SaveChangesAsync();
-    } 
+    }
 }

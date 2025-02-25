@@ -1,6 +1,7 @@
 using System;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
+using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.DTOs;
@@ -124,8 +125,6 @@ public class BookService : IBookService
             book.Id = id;
 
             await _repository.UpdateAsync(id, book.ToDao());
-
-            throw new NotImplementedException();
         }
         catch (ResourceNotFoundException)
         {
@@ -138,13 +137,13 @@ public class BookService : IBookService
     }
 
 
-    public async Task UpdateGenresAsync(int bookId, IEnumerable<string> authorIds)
+    public async Task UpdateGenresAsync(int bookId, IEnumerable<string> genreCodes)
     {
         try
-        {
-            var genres = await _unitOfWork.GenreRepository.GetByCodesAsync(authorIds);
+        {  
+            var genres = await _unitOfWork.GenreRepository.GetByCodesAsync(genreCodes);
 
-            var resultValidation = ValidateCollections(authorIds, genres.Select(g => g.Code));
+            var resultValidation = ValidateCollections(genreCodes, genres.Select(g => g.Code));
 
             if (!resultValidation.IsValid)
                 throw new ResourceNotFoundException(resultValidation.ErrorMessage);
@@ -171,14 +170,14 @@ public class BookService : IBookService
     public async Task UpdateAuthorsAsync(int bookId, IEnumerable<int> authorIds)
     {
         try
-        {  
+        {
             var authors = await _unitOfWork.AuthorRepository.GetByIdsAsync(authorIds);
 
             var resultValidation = ValidateCollections(authorIds, authors.Select(a => a.AuthorId));
 
             if (!resultValidation.IsValid)
                 throw new ResourceNotFoundException(resultValidation.ErrorMessage);
-            
+
             await _unitOfWork.BeginTransactionAsync();
 
             await _unitOfWork.BookRepository.UpdateAuthorsAsync(bookId, authors);
@@ -221,9 +220,10 @@ public class BookService : IBookService
     }
 
 
+  
     private ResultValidation ValidateCollections<T>(IEnumerable<T> dtoList, IEnumerable<T> daoList)
     {
-        var nonExistingElements = dtoList.Except(daoList);
+        var nonExistingElements = dtoList.Except(daoList).ToList();
 
         if (!nonExistingElements.Any())
             return new ResultValidation();

@@ -84,6 +84,8 @@ public class AuthorService : IAuthorService
     {
         try
         {
+            author.Id = id;
+
             await _repository.UpdateAsync(id, author.ToDao());
         }
         catch(ResourceNotFoundException) 
