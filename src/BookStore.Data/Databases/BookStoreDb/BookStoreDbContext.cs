@@ -116,6 +116,8 @@ public partial class BookStoreDbContext : DbContext
 
         modelBuilder.Entity<Isbn>(entity =>
         {
+            entity.Property(e => e.EditionId).ValueGeneratedNever();
+
             entity.HasOne(d => d.Edition).WithOne(p => p.Isbn).HasConstraintName("FK_ISBN_EDITION");
         });
 

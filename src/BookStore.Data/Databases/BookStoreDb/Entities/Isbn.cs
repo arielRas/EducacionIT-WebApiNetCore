@@ -7,17 +7,17 @@ using Microsoft.EntityFrameworkCore;
 namespace BookStore.Data.Databases.BookStoreDb.Entities;
 
 [Table("ISBN")]
-[Index("EditionId", Name = "UQ_ISBN_EDITION_ID", IsUnique = true)]
+[Index("Code", Name = "UQ_ISBN_CODE", IsUnique = true)]
 public partial class Isbn
 {
     [Key]
+    [Column("EDITION_ID")]
+    public Guid EditionId { get; set; }
+
     [Column("CODE")]
     [StringLength(13)]
     [Unicode(false)]
     public string Code { get; set; } = null!;
-
-    [Column("EDITION_ID")]
-    public Guid EditionId { get; set; }
 
     [ForeignKey("EditionId")]
     [InverseProperty("Isbn")]
