@@ -1,4 +1,5 @@
 using System;
+using BookStore.Data.Databases.AuthenticationDb;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.Repository.Repositories;
@@ -17,6 +18,9 @@ public static class DependencyInjection
         //Contextos de Base de datos
         services.AddDbContext<BookStoreDbContext>(option =>
             option.UseSqlServer(configuration.GetConnectionString("BookStoreDb")));
+        
+        services.AddDbContext<AuthDbContext>(option =>
+            option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
