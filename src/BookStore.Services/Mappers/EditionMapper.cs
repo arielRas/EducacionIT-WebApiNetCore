@@ -20,6 +20,19 @@ internal static class EditionMapper
         };
     }
 
+    public static Edition ToDao(this EditionRequestCreateDto dto)
+    {
+        return new Edition
+        {            
+            Pages = dto.Pages,
+            PublicationDate = dto.PublicationDate,
+            Language = dto.Language,
+            BookId = dto.BookId,
+            EditorialId = dto.EditorialId,
+            TypeCode = dto.TypeCode
+        };
+    }
+
     public static EditionDto ToDto(this Edition dao)
     {
         return new EditionDto
@@ -28,7 +41,7 @@ internal static class EditionMapper
             PublicationDate = dao.PublicationDate,
             Pages = dao.Pages,
             Language = dao.Language,
-            TypeCode = dao.EditionType.Code
+            TypeCode = dao.TypeCode
         };
     }
 

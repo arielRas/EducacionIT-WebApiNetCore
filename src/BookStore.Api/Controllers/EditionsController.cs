@@ -99,13 +99,13 @@ public class EditionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<EditionResponseDto>> Create([FromBody] EditionRequestCreateDto edition)
+    public async Task<ActionResult<EditionDto>> Create([FromBody] EditionRequestCreateDto edition)
     {
         try
         {   
             var newEdition = await _service.CreateAsync(edition);
 
-            return CreatedAtAction(nameof(GetById), new {Id = newEdition.Id}, newEdition);
+            return CreatedAtAction(nameof(GetById), new { Id = newEdition.Id }, newEdition);
         }
         catch(BusinessException ex)
         {

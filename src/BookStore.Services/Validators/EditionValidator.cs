@@ -9,7 +9,7 @@ internal static class EditionValidator
 {
     public static ResultValidation Validate(this EditionRequestCreateDto editionDto)
     {
-        if(Regex.IsMatch(editionDto.TypeCode, @"^[A-Z]{5}$"))
+        if(!Regex.IsMatch(editionDto.TypeCode, @"^[A-Z]{5}$"))
             return new ResultValidation("The edition type field must have 5 uppercase alphabetical characters");
 
         if(editionDto.Isbn != null && editionDto.Isbn.Count() != 13)
@@ -29,7 +29,7 @@ internal static class EditionValidator
 
     public static ResultValidation Validate(this EditionRequestUpdateDto editionDto)
     {
-        if (Regex.IsMatch(editionDto.TypeCode, @"^[A-Z]{5}$"))
+        if (!Regex.IsMatch(editionDto.TypeCode, @"^[A-Z]{5}$"))
             return new ResultValidation("The edition type field must have 5 uppercase alphabetical characters");
 
         if (editionDto.BookId <= 0)

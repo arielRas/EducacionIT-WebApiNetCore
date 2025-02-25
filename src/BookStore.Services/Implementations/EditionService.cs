@@ -108,9 +108,9 @@ public class EditionService : IEditionService
             if(edition.Isbn is not null)
                 await _unitOfWork.IsbnRepository.CreateAsync(CreateIsbn(editionDao, edition.Isbn));
 
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.CommitTransactionAsync();            
 
-            return editionDao.ToResposeDto();
+            return editionDao.ToDto(); 
         }
         catch(BusinessException)
         {
