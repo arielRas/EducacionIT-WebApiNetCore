@@ -1,5 +1,7 @@
 
 using BookStore.Api.DependencyInjection;
+using BookStore.Data.Databases.AuthenticationDb;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookStore.Api
 {
@@ -11,9 +13,9 @@ namespace BookStore.Api
 
             //Servicos de la app
             builder.Services.AddAplicactionServices(builder.Configuration)
-                            .AddControllers();
+                            .AddControllers();           
 
-            
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
