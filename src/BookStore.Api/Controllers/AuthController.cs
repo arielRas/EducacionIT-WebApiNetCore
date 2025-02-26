@@ -1,9 +1,8 @@
-﻿using BookStore.Api.Models.Mappers;
-using BookStore.Services.DTOs;
-using Microsoft.AspNetCore.Http;
+﻿using BookStore.Services.DTOs;
+using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security;
+using System.Security.Authentication;
 
 namespace BookStore.Api.Controllers
 {
@@ -11,36 +10,79 @@ namespace BookStore.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IAuthService _service;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public AuthController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AuthController(IAuthService service, SignInManager<IdentityUser> signInManager)
         {
-            _userManager = userManager;
+            _service = service;
             _signInManager = signInManager;
         }
 
-        [HttpPost("/Login")]
+
+        [HttpPost("/Users/Login")]
         public async Task<ActionResult<string>> LogIn([FromBody] UserLogin user)
-        {            
+        {     
+            try
+            {
+                if (!await ValidateCredential(user))
+                    return Unauthorized( new { message = "Invalid Credential" });
 
-            if (!await ValidateCredential(user))
-                return Unauthorized( new { message = "Invalid Credential" });
-
-            return Ok("Aqui proximamente se enviara JWT");
+                return Ok("Aqui proximamente se enviara JWT");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }           
         }
 
 
-        [HttpPost("/SignUp")]
-        public async Task<IActionResult> SignUp(UserSignUp user)
+        [HttpPost("/Users/SignUp")]
+        public async Task<IActionResult> SignUp([FromBody] UserSingUpDto user)
         {
-            var result = await _userManager.CreateAsync(user.ToIdentity(), user.Password);
+            try
+            {
+                if(!ModelState.IsValid) 
+                    return BadRequest(ModelState);
 
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+                await _service.SignUpAsync(user);
 
-            return Ok();
+                string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+
+                return Created(baseUrl, new {UserName = user.Username});
+            }
+            catch(AuthenticationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }            
         }
+
+
+        [HttpPost("/Roles")]
+        public async Task<IActionResult> CreateRole([FromBody] string roleName)
+        {           
+            try
+            {
+                await _service.CreateRoleAsync(roleName);
+
+                string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+
+                return Created(baseUrl, new {RoleName = roleName});
+            }
+            catch(AuthenticationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            } 
+        }
+
 
         private async Task<bool> ValidateCredential(UserLogin user)
         {
@@ -51,7 +93,6 @@ namespace BookStore.Api.Controllers
                                            lockoutOnFailure: false);
 
             return result.Succeeded;
-
         }
     }
 }

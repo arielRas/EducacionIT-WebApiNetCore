@@ -3,6 +3,7 @@ using BookStore.Data.Databases.AuthenticationDb;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.Repository.Repositories;
+using BookStore.Data.UnitOfWork;
 using BookStore.Data.UnitOfWork.Implementation;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.Implementations;
@@ -43,6 +44,8 @@ public static class DependencyInjection
         services.AddScoped<IEditionRepository, EditionRepository>();
         services.AddScoped<IEditionService, EditionService>();
         services.AddScoped<IEditionUnitOfWork, EditionUnitOfWork>();
+        services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
+        services.AddScoped<IAuthService, AuthService>();
 
 
         return services;
