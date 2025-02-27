@@ -26,12 +26,7 @@ public static class DependencyInjection
             option.UseSqlServer(configuration.GetConnectionString("BookStoreDb")));
         
         services.AddDbContext<AuthDbContext>(option =>
-            option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
-
-        //Registro de servicios de autenticacion
-        services.AddIdentity<IdentityUser, IdentityRole>()
-                        .AddEntityFrameworkStores<AuthDbContext>()
-                        .AddDefaultTokenProviders();
+            option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));        
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
@@ -51,6 +46,11 @@ public static class DependencyInjection
         services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<JwtGeneratorService>();
+
+        //Registro de servicios de autenticacion Identity
+        services.AddIdentity<IdentityUser, IdentityRole>()
+                        .AddEntityFrameworkStores<AuthDbContext>()
+                        .AddDefaultTokenProviders();
 
         //Autenticacion JWT
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

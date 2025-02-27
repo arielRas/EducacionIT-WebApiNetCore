@@ -1,4 +1,5 @@
-﻿using BookStore.Services.DTOs;
+﻿using BookStore.Common.Exceptions;
+using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,20 +23,24 @@ namespace BookStore.Api.Controllers
 
         [HttpPost("/Users/Login")]
         public async Task<ActionResult<string>> LogIn([FromBody] UserLogin user)
-        {     
+        {
             try
             {
                 if (!await ValidateCredential(user))
-                    return Unauthorized( new { message = "Invalid Credential" });
-                
+                    return Unauthorized(new { message = "Invalid Credential" });
+
                 var token = await _service.GetJwtTokenAsync(user.Username);
 
                 return Ok(token);
             }
-            catch(Exception ex)
+            catch (ResourceNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }           
+            }
         }
 
 
@@ -44,45 +49,45 @@ namespace BookStore.Api.Controllers
         {
             try
             {
-                if(!ModelState.IsValid) 
+                if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
                 await _service.SignUpAsync(user);
 
                 string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
 
-                return Created(baseUrl, new {UserName = user.Username});
+                return Created(baseUrl, new { UserName = user.Username });
             }
-            catch(AuthenticationException ex)
+            catch (AuthenticationException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }            
+            }
         }
 
 
         [HttpPost("/Roles")]
         public async Task<IActionResult> CreateRole([FromBody] string roleName)
-        {           
+        {
             try
             {
                 await _service.CreateRoleAsync(roleName);
 
                 string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
 
-                return Created(baseUrl, new {RoleName = roleName});
+                return Created(baseUrl, new { RoleName = roleName });
             }
-            catch(AuthenticationException ex)
+            catch (AuthenticationException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            } 
+            }
         }
 
 

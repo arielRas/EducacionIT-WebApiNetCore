@@ -84,6 +84,10 @@ public class AuthService : IAuthService
 
             return _tokenGenerator.Generate(user.ToDto(roles));
         }
+        catch(ResourceNotFoundException)
+        {
+            throw;
+        } 
         catch(Exception)
         {
             throw;
