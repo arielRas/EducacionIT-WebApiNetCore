@@ -27,8 +27,10 @@ namespace BookStore.Api.Controllers
             {
                 if (!await ValidateCredential(user))
                     return Unauthorized( new { message = "Invalid Credential" });
+                
+                var token = await _service.GetJwtTokenAsync(user.Username);
 
-                return Ok("Aqui proximamente se enviara JWT");
+                return Ok(token);
             }
             catch(Exception ex)
             {

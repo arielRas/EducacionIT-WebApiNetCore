@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using BookStore.Data.Databases.AuthenticationDb;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
@@ -8,8 +9,11 @@ using BookStore.Data.UnitOfWork.Implementation;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.Implementations;
 using BookStore.Services.Interfaces;
+using BookStore.Services.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BookStore.Api.DependencyInjection;
 
@@ -46,7 +50,23 @@ public static class DependencyInjection
         services.AddScoped<IEditionUnitOfWork, EditionUnitOfWork>();
         services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<JwtGeneratorService>();
 
+        //Autenticacion JWT
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = configuration["JWT:BookStore"],
+                        ValidAudience = configuration["JWT:Users"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!))
+                    };
+                });
 
         return services;
     }

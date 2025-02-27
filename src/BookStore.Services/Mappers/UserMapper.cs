@@ -14,4 +14,14 @@ internal static class UserMapper
             Email = dto.Email
         };
     }
+
+    public static UserLoggedDto ToDto(this IdentityUser dao, IEnumerable<string> roles)
+    {
+        return new UserLoggedDto
+        {
+            Id = dao.Id,
+            Username = dao.UserName!,
+            Roles = roles.ToList()
+        };
+    }
 }

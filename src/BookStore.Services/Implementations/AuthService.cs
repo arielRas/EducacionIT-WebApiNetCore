@@ -1,9 +1,11 @@
 using System;
 using System.Security.Authentication;
+using BookStore.Common.Exceptions;
 using BookStore.Data.UnitOfWork;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using BookStore.Services.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 
@@ -13,11 +15,13 @@ public class AuthService : IAuthService
 {
     private readonly IAuthUnitOfWork _unitOfWork;
     private readonly string _defaultRole;
+    private readonly JwtGeneratorService _tokenGenerator;
 
-    public AuthService(IAuthUnitOfWork unitOfWork, IConfiguration configuration)
+    public AuthService(IAuthUnitOfWork unitOfWork, IConfiguration configuration, JwtGeneratorService tokenGenerator)
     {
         _unitOfWork = unitOfWork;
         _defaultRole = configuration.GetSection("identity:DefaultRole").Value!;
+        _tokenGenerator = tokenGenerator;
     }   
 
     public async Task SignUpAsync(UserSingUpDto user)
@@ -67,5 +71,22 @@ public class AuthService : IAuthService
         {
             throw;
         } 
+    }
+
+    public async Task<string> GetJwtTokenAsync(string userName)
+    {
+        try
+        {
+            var user = await _unitOfWork.UserManager.FindByNameAsync(userName)
+                ?? throw new ResourceNotFoundException();
+
+            var roles = await _unitOfWork.UserManager.GetRolesAsync(user);
+
+            return _tokenGenerator.Generate(user.ToDto(roles));
+        }
+        catch(Exception)
+        {
+            throw;
+        }        
     }
 }
