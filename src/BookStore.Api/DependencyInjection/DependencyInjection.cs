@@ -54,26 +54,32 @@ public static class DependencyInjection
                         .AddDefaultTokenProviders();
 
         //Autenticacion JWT
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = configuration["JWT:BookStore"],
-                        ValidAudience = configuration["JWT:Users"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!))
-                    };
-                });
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configuration["JWT:Issuer"],
+                ValidAudience = configuration["JWT:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!))
+            };
+        });
+
+        //services.AddAuthorization();
 
         //Se registra Swagger como explorador de Endpoints y se agrega campo para utilizar JWT
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options => // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        services.AddSwaggerGen(options =>
         {
-            //options.SwaggerDoc("v1", new OpenApiInfo { Title = "Biblioteca API", Version = "v1" });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "BookStore API", Version = "v1" });
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,

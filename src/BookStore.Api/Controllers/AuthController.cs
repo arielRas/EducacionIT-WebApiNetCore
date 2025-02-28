@@ -1,6 +1,7 @@
 ﻿using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Authentication;
@@ -68,7 +69,7 @@ namespace BookStore.Api.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("/Roles")]
         public async Task<IActionResult> CreateRole([FromBody] string roleName)
         {
