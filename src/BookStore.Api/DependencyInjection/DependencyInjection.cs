@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace BookStore.Api.DependencyInjection;
 
@@ -24,9 +25,9 @@ public static class DependencyInjection
         //Contextos de Base de datos
         services.AddDbContext<BookStoreDbContext>(option =>
             option.UseSqlServer(configuration.GetConnectionString("BookStoreDb")));
-        
+
         services.AddDbContext<AuthDbContext>(option =>
-            option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));        
+            option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
@@ -67,6 +68,35 @@ public static class DependencyInjection
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!))
                     };
                 });
+
+        //Se registra Swagger como explorador de Endpoints y se agrega campo para utilizar JWT
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(options => // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        {
+            //options.SwaggerDoc("v1", new OpenApiInfo { Title = "Biblioteca API", Version = "v1" });
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Enter the JWT with Bearer in the field",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[]{ }
+                }
+            });
+        });
 
         return services;
     }
