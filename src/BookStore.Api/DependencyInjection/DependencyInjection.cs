@@ -48,10 +48,21 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<JwtGeneratorService>();
 
-        //Registro de servicios de autenticacion Identity
-        services.AddIdentity<IdentityUser, IdentityRole>()
-                        .AddEntityFrameworkStores<AuthDbContext>()
-                        .AddDefaultTokenProviders();
+        //Registro y configuracion de servicios de autenticacion Identity
+        services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        {
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_.@";
+            options.User.RequireUniqueEmail =true;
+            options.Password.RequireDigit = false;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 8;
+            options.Password.RequiredUniqueChars = 1;
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        })
+        .AddEntityFrameworkStores<AuthDbContext>()
+        .AddDefaultTokenProviders();
 
         //Autenticacion JWT
         services.AddAuthentication(options =>

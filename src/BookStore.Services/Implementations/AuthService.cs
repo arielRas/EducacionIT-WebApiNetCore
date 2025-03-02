@@ -55,23 +55,7 @@ public class AuthService : IAuthService
             throw;
         }        
     }
-
-    public async Task CreateRoleAsync(string roleName)
-    {
-        try
-        {
-            var role = new IdentityRole{ Name = roleName };
-
-            var result = await _unitOfWork.RoleManager.CreateAsync(role);
-
-            if(!result.Succeeded)
-                throw new AuthenticationException(result.Errors.ToString());
-        }       
-        catch(Exception)
-        {
-            throw;
-        } 
-    }
+    
 
     public async Task<string> GetJwtTokenAsync(string userName)
     {
@@ -92,5 +76,35 @@ public class AuthService : IAuthService
         {
             throw;
         }        
+    }
+
+    public async Task<RoleDto> CreateRoleAsync(string roleName)
+    {
+        try
+        {
+            var role = new IdentityRole{ Name = roleName };
+
+            var result = await _unitOfWork.RoleManager.CreateAsync(role);
+
+            if(!result.Succeeded)
+                throw new AuthenticationException(result.Errors.ToString());
+            
+            role = await _unitOfWork.RoleManager.FindByNameAsync(roleName)
+                ?? throw new ResourceNotFoundException($"Role with name {roleName} is not found");
+
+            return role.ToDto();
+        }       
+        catch(Exception)
+        {
+            throw;
+        } 
+    }
+
+    public async Task<RoleDto> GetRoleByIdAsync(Guid id)
+    {
+        var role = await _unitOfWork.RoleManager.FindByIdAsync(id.ToString())
+            ?? throw new ResourceNotFoundException($"Role with ID {id} is not found");
+        
+        return role.ToDto();
     }
 }
