@@ -1,12 +1,22 @@
 using System;
+using System.Text;
+using BookStore.Common.Configuration;
+using BookStore.Data.Databases.AuthenticationDb;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.Repository.Repositories;
+using BookStore.Data.UnitOfWork;
 using BookStore.Data.UnitOfWork.Implementation;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.Implementations;
 using BookStore.Services.Interfaces;
+using BookStore.Services.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace BookStore.Api.DependencyInjection;
 
@@ -17,6 +27,12 @@ public static class DependencyInjection
         //Contextos de Base de datos
         services.AddDbContext<BookStoreDbContext>(option =>
             option.UseSqlServer(configuration.GetConnectionString("BookStoreDb")));
+
+        services.AddDbContext<AuthDbContext>(option =>
+            option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
+
+        //Registro de configuraciones
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
@@ -33,6 +49,78 @@ public static class DependencyInjection
         services.AddScoped<IEditionRepository, EditionRepository>();
         services.AddScoped<IEditionService, EditionService>();
         services.AddScoped<IEditionUnitOfWork, EditionUnitOfWork>();
+        services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<JwtGeneratorService>();
+
+        //Registro y configuracion de servicios de autenticacion Identity
+        services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        {
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_.@";
+            options.User.RequireUniqueEmail =true;
+            options.Password.RequireDigit = false;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 8;
+            options.Password.RequiredUniqueChars = 1;
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        })
+        .AddEntityFrameworkStores<AuthDbContext>()
+        .AddDefaultTokenProviders();
+
+        //Autenticacion JWT
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            var jwtSettings = services.BuildServiceProvider()
+                                      .GetService<IOptions<JwtSettings>>()?.Value
+                                      ?? throw new InvalidOperationException("JWT settings are not configured properly.");
+
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+            };
+        });
+
+        //Se registra Swagger como explorador de Endpoints y se agrega campo para utilizar JWT
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "BookStore API", Version = "v1" });
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Enter the JWT with Bearer in the field",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[]{ }
+                }
+            });
+        });
 
         return services;
     }

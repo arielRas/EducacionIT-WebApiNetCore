@@ -2,10 +2,12 @@ using System.Text.RegularExpressions;
 using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Api.Controllers;
 
+[Authorize(Roles = "User")]
 [Route("api/[controller]")]
 [ApiController]
 public class EditionTypesController : ControllerBase
@@ -66,6 +68,7 @@ public class EditionTypesController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -91,6 +94,7 @@ public class EditionTypesController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{code}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -124,6 +128,7 @@ public class EditionTypesController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{code}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
