@@ -1,5 +1,6 @@
-﻿using BookStore.Services.DTOs;
-using Microsoft.Extensions.Configuration;
+﻿using BookStore.Common.Configuration;
+using BookStore.Services.DTOs;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,14 +10,14 @@ namespace BookStore.Services.Security
 {
     public class JwtGeneratorService
     {
-        private readonly IConfigurationSection _jwtSettings;
+        private readonly JwtSettings _jwtSettings;
 
-        public JwtGeneratorService(IConfiguration configuration)
-            => _jwtSettings = configuration.GetSection("JWT");
+        public JwtGeneratorService(IOptions<JwtSettings> settings)
+            => _jwtSettings = settings.Value;
 
         public string Generate(UserLoggedDto user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings["SecretKey"]!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
 
             var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -32,9 +33,9 @@ namespace BookStore.Services.Security
             var token = new JwtSecurityToken
             (
                 signingCredentials: credential,
-                issuer: _jwtSettings["Issuer"],
-                audience: _jwtSettings["Audience"],
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings["ExpirationMinutes"])),
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings.ExpirationMinutes)),
                 claims: claims
             );
 

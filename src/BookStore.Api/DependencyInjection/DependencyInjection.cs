@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using BookStore.Common.Configuration;
 using BookStore.Data.Databases.AuthenticationDb;
 using BookStore.Data.Databases.BookStoreDb;
 using BookStore.Data.Repository.Interfaces;
@@ -13,6 +14,7 @@ using BookStore.Services.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -28,6 +30,9 @@ public static class DependencyInjection
 
         services.AddDbContext<AuthDbContext>(option =>
             option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
+
+        //Registro de configuraciones
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
@@ -72,19 +77,21 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
+            var jwtSettings = services.BuildServiceProvider()
+                                      .GetService<IOptions<JwtSettings>>()?.Value
+                                      ?? throw new InvalidOperationException("JWT settings are not configured properly.");
+
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["JWT:Issuer"],
-                ValidAudience = configuration["JWT:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!))
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
             };
         });
-
-        //services.AddAuthorization();
 
         //Se registra Swagger como explorador de Endpoints y se agrega campo para utilizar JWT
         services.AddEndpointsApiExplorer();
