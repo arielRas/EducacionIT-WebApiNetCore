@@ -1,11 +1,12 @@
 using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Api.Controllers;
 
+[Authorize(Roles = "User")]
 [Route("api/[controller]")]
 [ApiController]
 public class BooksController : ControllerBase
@@ -92,6 +93,7 @@ public class BooksController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -122,6 +124,7 @@ public class BooksController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -149,6 +152,7 @@ public class BooksController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPatch("{id:int}/Genres/Update")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -182,6 +186,7 @@ public class BooksController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPatch("{id:int}/Authors/Update")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -218,6 +223,7 @@ public class BooksController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
