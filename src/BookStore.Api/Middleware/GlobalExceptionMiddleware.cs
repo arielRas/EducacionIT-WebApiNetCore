@@ -24,13 +24,15 @@ public class GlobalExceptionMiddleware
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error");
+            var errorId = Guid.NewGuid();
 
-            await HandleExceptionAsync(context, ex);
+            _logger.LogError(ex, $"Unexpected error occurred. ErrorId: {errorId}");
+
+            await HandleExceptionAsync(context, ex, errorId);
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception ex)
+    private static Task HandleExceptionAsync(HttpContext context, Exception ex, Guid errorId)
     {
         var response = context.Response;
 
@@ -46,10 +48,13 @@ public class GlobalExceptionMiddleware
 
         var error = new
         {
-            message = response.StatusCode != 500 
+            ErrorId = errorId,
+            TimeStamp = DateTime.UtcNow,
+            Path = context.Request.Path.Value,
+            StatusCode = response.StatusCode,
+            Message = response.StatusCode != 500 
                       ? ex.Message :
-                      "Unexpected error, please contact application support",
-            statusCode = response.StatusCode
+                      "Unexpected error, please contact application support"            
         };
 
         return response.WriteAsync(JsonSerializer.Serialize(error));
