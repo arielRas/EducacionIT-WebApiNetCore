@@ -38,10 +38,6 @@ public class EditionTypesController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -87,9 +83,9 @@ public class EditionTypesController : ControllerBase
 
             return CreatedAtAction(nameof(GetByCode), new { code = editionType.Code }, editionType);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            throw;
         }
     }
 
@@ -121,10 +117,6 @@ public class EditionTypesController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -148,10 +140,6 @@ public class EditionTypesController : ControllerBase
         catch (ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 

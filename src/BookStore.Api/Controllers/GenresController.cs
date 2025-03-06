@@ -37,10 +37,6 @@ public class GenresController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -59,10 +55,6 @@ public class GenresController : ControllerBase
         catch (ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -86,9 +78,9 @@ public class GenresController : ControllerBase
 
             return CreatedAtAction(nameof(GetByCode), new { code = genre.Code }, genre);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            throw;
         }
     }
 
@@ -120,10 +112,6 @@ public class GenresController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -147,10 +135,6 @@ public class GenresController : ControllerBase
         catch (ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 

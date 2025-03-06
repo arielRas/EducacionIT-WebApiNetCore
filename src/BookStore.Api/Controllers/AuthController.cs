@@ -43,10 +43,6 @@ public class AuthController : ControllerBase
         {
             return Unauthorized(new { message = "Invalid Credential" });
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -71,10 +67,6 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -98,10 +90,6 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -124,13 +112,10 @@ public class AuthController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(new {Message = ex.Message});
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return NotFound(new {message = ex.Message});
         }
     }
+
 
     private async Task<bool> ValidateCredential(UserLogin user)
     {

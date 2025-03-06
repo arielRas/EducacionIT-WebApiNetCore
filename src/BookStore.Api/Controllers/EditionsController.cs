@@ -37,10 +37,6 @@ public class EditionsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
     }
 
 
@@ -59,10 +55,6 @@ public class EditionsController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -87,10 +79,6 @@ public class EditionsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
     }
 
 
@@ -110,10 +98,6 @@ public class EditionsController : ControllerBase
         catch(BusinessException ex)
         {
             return BadRequest(ex.Message);
-        }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -143,10 +127,6 @@ public class EditionsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
     }
 
 
@@ -173,10 +153,6 @@ public class EditionsController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -205,10 +181,6 @@ public class EditionsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
     }
 
 
@@ -233,10 +205,5 @@ public class EditionsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
     }
-
 }

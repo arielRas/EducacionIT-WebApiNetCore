@@ -24,7 +24,7 @@ public class GlobalExceptionMiddleware
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "unexpected error");
+            _logger.LogError(ex, "Unexpected error");
 
             await HandleExceptionAsync(context, ex);
         }
@@ -46,7 +46,9 @@ public class GlobalExceptionMiddleware
 
         var error = new
         {
-            message = ex.Message,
+            message = response.StatusCode != 500 
+                      ? ex.Message :
+                      "Unexpected error, please contact application support",
             statusCode = response.StatusCode
         };
 

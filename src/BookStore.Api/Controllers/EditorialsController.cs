@@ -36,10 +36,6 @@ public class EditorialsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -58,10 +54,6 @@ public class EditorialsController : ControllerBase
         catch (ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -85,9 +77,9 @@ public class EditorialsController : ControllerBase
 
             return CreatedAtAction(nameof(GetById), new { Id = editorial.Id }, editorial);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            throw;
         }
     }
 
@@ -118,10 +110,6 @@ public class EditorialsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -144,10 +132,6 @@ public class EditorialsController : ControllerBase
         catch (ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 }

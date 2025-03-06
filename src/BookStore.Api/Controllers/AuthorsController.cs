@@ -40,10 +40,6 @@ public class AuthorsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -63,10 +59,6 @@ public class AuthorsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
     [Authorize(Roles = "Admin")]
@@ -85,10 +77,7 @@ public class AuthorsController : ControllerBase
 
             return CreatedAtAction(nameof(GetById), new { Id = author.Id}, author);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
+        catch (Exception) { throw; }
     }
 
 
@@ -116,10 +105,6 @@ public class AuthorsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -143,10 +128,6 @@ public class AuthorsController : ControllerBase
         catch (ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 }

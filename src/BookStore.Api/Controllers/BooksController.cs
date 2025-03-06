@@ -36,10 +36,6 @@ public class BooksController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -58,10 +54,6 @@ public class BooksController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -85,10 +77,6 @@ public class BooksController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -117,10 +105,6 @@ public class BooksController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -144,10 +128,6 @@ public class BooksController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -178,10 +158,6 @@ public class BooksController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -216,10 +192,6 @@ public class BooksController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
     }
 
 
@@ -243,10 +215,6 @@ public class BooksController : ControllerBase
         catch(ResourceNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 }
