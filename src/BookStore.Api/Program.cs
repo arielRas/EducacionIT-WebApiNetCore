@@ -1,4 +1,5 @@
 using BookStore.Api.DependencyInjection;
+using BookStore.Api.Middleware;
 
 namespace BookStore.Api
 {
@@ -23,6 +24,8 @@ namespace BookStore.Api
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.UseAuthentication();
 
