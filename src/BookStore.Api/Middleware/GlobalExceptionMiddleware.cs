@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using BookStore.Api.Models;
 using BookStore.Common.Exceptions;
 
 namespace BookStore.Api.Middleware;
@@ -46,15 +47,15 @@ public class GlobalExceptionMiddleware
             _ => StatusCodes.Status500InternalServerError
         };
 
-        var error = new
+        var error = new ApiErrorCritical
         {
-            ErrorId = errorId,
+            Id = errorId,
             TimeStamp = DateTime.UtcNow,
             Path = context.Request.Path.Value,
-            StatusCode = response.StatusCode,
-            Message = response.StatusCode != 500 
-                      ? ex.Message :
-                      "Unexpected error, please contact application support"            
+            Status = response.StatusCode,
+            Description = response.StatusCode != 500 
+                          ? ex.Message 
+                          : "Unexpected error, please contact application support"  
         };
 
         return response.WriteAsync(JsonSerializer.Serialize(error));
