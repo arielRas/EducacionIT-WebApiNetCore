@@ -8,20 +8,27 @@ using BookStore.Services.Mappers;
 using BookStore.Services.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
 public class AuthService : IAuthService
 {
-    private readonly IAuthUnitOfWork _unitOfWork;
-    private readonly string _defaultRole;
+    private readonly IAuthUnitOfWork _unitOfWork;    
     private readonly JwtGeneratorService _tokenGenerator;
+    private readonly ILogger _logger;
+    private readonly string _defaultRole;
 
-    public AuthService(IAuthUnitOfWork unitOfWork, IConfiguration configuration, JwtGeneratorService tokenGenerator)
+    public AuthService(
+        IAuthUnitOfWork unitOfWork,
+        IConfiguration configuration,
+        JwtGeneratorService tokenGenerator,
+        ILogger<AuthService> logger)
     {
         _unitOfWork = unitOfWork;
         _defaultRole = configuration.GetSection("identity:DefaultRole").Value!;
         _tokenGenerator = tokenGenerator;
+        _logger = logger;
     }   
 
     public async Task SignUpAsync(UserSingUpDto user)
@@ -68,13 +75,21 @@ public class AuthService : IAuthService
 
             return _tokenGenerator.Generate(user.ToDto(roles));
         }
-        catch(ResourceNotFoundException)
+        catch(ResourceNotFoundException ex)
         {
-            throw;
+           _logger.LogError(ex, $"{nameof(GetJwtTokenAsync)} method, Error trying to get user with userName {userName}");
+           
+           throw;
         } 
-        catch(Exception)
+        catch(AutenticationException ex)
         {
-            throw;
+            var errorId = Guid.NewGuid();    
+
+            _logger.LogError(ex, $"ErrorId: {errorId}. {nameof(GetJwtTokenAsync)} method, error generating security token");
+
+            var message = "Unexpected error occurred during authentication process, please contact application support";           
+
+            throw new AutenticationException($"{errorId} - {message}");
         }        
     }
 

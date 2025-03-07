@@ -26,7 +26,7 @@ public class GlobalExceptionMiddleware
         {
             var errorId = Guid.NewGuid();
 
-            _logger.LogError(ex, $"Unexpected error occurred. ErrorId: {errorId}");
+            _logger.LogError(ex, $"ErrorId: {errorId}: Unexpected error occurred.");
 
             await HandleExceptionAsync(context, ex, errorId);
         }

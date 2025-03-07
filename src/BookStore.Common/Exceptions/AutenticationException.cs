@@ -2,6 +2,7 @@ using System;
 
 namespace BookStore.Common.Exceptions;
 
+[Serializable]
 public class AutenticationException : Exception
 {
     public AutenticationException() : base("An error occurred while trying to authenticate your identity")

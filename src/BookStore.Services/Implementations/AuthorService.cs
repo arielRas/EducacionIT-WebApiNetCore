@@ -4,15 +4,21 @@ using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
 public class AuthorService : IAuthorService
 {
     private readonly IAuthorRepository _repository;
+    private readonly ILogger _logger;
+    
 
-    public AuthorService(IAuthorRepository repository)
-        => _repository = repository;
+    public AuthorService(IAuthorRepository repository, ILogger<AuthorService> logger)
+    {
+        _repository = repository;
+        _logger = logger;
+    } 
 
     public async Task<AuthorDto> GetByIdAsync(int id)
     {        
@@ -22,12 +28,10 @@ public class AuthorService : IAuthorService
             
             return author.ToResponseDto();
         }
-        catch(ResourceNotFoundException) 
+        catch(ResourceNotFoundException ex) 
         {
-            throw;
-        }
-        catch(Exception)
-        {
+            _logger.LogWarning(ex, $"{nameof(GetByIdAsync)} method, Error trying to get resource with id {id}");
+
             throw;
         }
     }
@@ -42,10 +46,6 @@ public class AuthorService : IAuthorService
         {
             throw;
         }
-        catch(Exception)
-        {
-            throw;
-        }
     }
 
     public async Task<IEnumerable<AuthorDto>> GetAllAsync()
@@ -54,14 +54,12 @@ public class AuthorService : IAuthorService
         {
             return (await _repository.GetAllAsync()).Select(a => a.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch(ResourceNotFoundException ex) 
         {
+            _logger.LogWarning(ex, $"{nameof(GetAllAsync)} method, does not return any resources");
+
             throw;
-        }
-        catch(Exception)
-        {
-            throw;
-        }        
+        }      
     } 
 
     public async Task<AuthorDto> CreateAsync(AuthorDto author)
@@ -88,12 +86,10 @@ public class AuthorService : IAuthorService
 
             await _repository.UpdateAsync(id, author.ToDao());
         }
-        catch(ResourceNotFoundException) 
+        catch(ResourceNotFoundException ex) 
         {
-            throw;
-        }
-        catch(Exception)
-        {
+            _logger.LogWarning(ex, $"{nameof(UpdateAsync)} method, Error trying to get resource with id {id}");
+
             throw;
         }
     }
@@ -104,12 +100,10 @@ public class AuthorService : IAuthorService
         {
             await _repository.DeleteAsync(id);
         }
-        catch(ResourceNotFoundException) 
+        catch(ResourceNotFoundException ex) 
         {
-            throw;
-        }
-        catch(Exception)
-        {
+            _logger.LogWarning(ex, $"{nameof(UpdateAsync)} method, Error trying to get resource with id {id}");
+
             throw;
         }
     }       
