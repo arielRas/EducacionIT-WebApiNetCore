@@ -4,6 +4,7 @@ using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
@@ -28,10 +29,8 @@ public class AuthorService : IAuthorService
             
             return author.ToResponseDto();
         }
-        catch(ResourceNotFoundException ex) 
+        catch(ResourceNotFoundException) 
         {
-            _logger.LogWarning(ex, $"{nameof(GetByIdAsync)} method, Error trying to get resource with id {id}");
-
             throw;
         }
     }
@@ -54,10 +53,8 @@ public class AuthorService : IAuthorService
         {
             return (await _repository.GetAllAsync()).Select(a => a.ToDto());
         }
-        catch(ResourceNotFoundException ex) 
+        catch(ResourceNotFoundException) 
         {
-            _logger.LogWarning(ex, $"{nameof(GetAllAsync)} method, does not return any resources");
-
             throw;
         }      
     } 
@@ -72,9 +69,15 @@ public class AuthorService : IAuthorService
 
             return authorDao.ToDto();
         }
-        catch(Exception)
+        catch(DbUpdateException ex)
         {
-            throw;
+            var traceId = Guid.NewGuid();
+
+            var message = "Error trying to create new resource";
+
+            _logger.LogError(ex, $"{traceId} - {nameof(CreateAsync)} method, {message}");
+
+            throw new DataBaseException(message, traceId);
         }
     }
 
@@ -86,11 +89,15 @@ public class AuthorService : IAuthorService
 
             await _repository.UpdateAsync(id, author.ToDao());
         }
-        catch(ResourceNotFoundException ex) 
+        catch (DbUpdateException ex)
         {
-            _logger.LogWarning(ex, $"{nameof(UpdateAsync)} method, Error trying to get resource with id {id}");
+            var traceId = Guid.NewGuid();
 
-            throw;
+            var message = $"Error trying to update resource with Id {id}";
+
+            _logger.LogError(ex, $"{traceId} - {nameof(UpdateAsync)} method, {message}");
+
+            throw new DataBaseException(message, traceId);
         }
     }
 
@@ -100,11 +107,15 @@ public class AuthorService : IAuthorService
         {
             await _repository.DeleteAsync(id);
         }
-        catch(ResourceNotFoundException ex) 
+        catch (DbUpdateException ex)
         {
-            _logger.LogWarning(ex, $"{nameof(UpdateAsync)} method, Error trying to get resource with id {id}");
+            var traceId = Guid.NewGuid();
 
-            throw;
-        }
+            var message = $"Error trying to delete resource with Id {id}";
+
+            _logger.LogError(ex, $"{traceId} - {nameof(DeleteAsync)} method, {message}");
+
+            throw new DataBaseException(message, traceId);
+        }        
     }       
 }
