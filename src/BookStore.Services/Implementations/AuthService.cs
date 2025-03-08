@@ -81,7 +81,7 @@ public class AuthService : IAuthService
            
            throw;
         } 
-        catch(AutenticationException ex)
+        catch(AuthException ex)
         {
             var errorId = Guid.NewGuid();    
 
@@ -89,7 +89,7 @@ public class AuthService : IAuthService
 
             var message = "Unexpected error occurred during authentication process, please contact application support";           
 
-            throw new AutenticationException($"{errorId} - {message}");
+            throw new AuthException($"{errorId} - {message}");
         }        
     }
 

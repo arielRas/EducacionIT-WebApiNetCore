@@ -43,7 +43,7 @@ public class GlobalExceptionMiddleware
         {
             ResourceNotFoundException => StatusCodes.Status404NotFound,
             BusinessException => StatusCodes.Status400BadRequest,
-            AutenticationException => StatusCodes.Status401Unauthorized,
+            AuthException => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError
         };
 
