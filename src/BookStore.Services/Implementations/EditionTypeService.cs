@@ -1,18 +1,26 @@
 using System;
+using System.Reflection;
 using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
+using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
 public class EditionTypeService : IEditionTypeService
 {
     private readonly IEditionTypeRepository _repository;
+    private readonly ILogger _logger;
 
-    public EditionTypeService(IEditionTypeRepository repository)
-        => _repository = repository;
+    public EditionTypeService(IEditionTypeRepository repository, ILogger<EditionTypeService> logger)
+    {
+        _repository = repository;
+        _logger = logger;
+    }
 
     public async Task<EditionTypeDto> GetByCodeAsync(string code)
     {
@@ -21,10 +29,6 @@ public class EditionTypeService : IEditionTypeService
             return (await _repository.GetByCodeAsync(code)).ToDto();
         }
         catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
         {
             throw;
         }
@@ -42,10 +46,6 @@ public class EditionTypeService : IEditionTypeService
         {
             throw;
         }
-        catch(Exception)
-        {
-            throw;
-        }
     }
 
     public async Task<EditionTypeDto> CreateAsync(EditionTypeDto type)
@@ -58,10 +58,13 @@ public class EditionTypeService : IEditionTypeService
 
             return editionTypeDao.ToDto();
         }
-        catch(Exception)
+        catch (DbUpdateException ex)
         {
-            throw;
+            var message = "Error trying to create resource";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
+
     }
 
     public async Task UpdateAsync(string code, EditionTypeDto type)
@@ -70,13 +73,11 @@ public class EditionTypeService : IEditionTypeService
         {
             await _repository.UpdateAsync(code, type.ToDao());
         }
-        catch(ResourceNotFoundException) 
+        catch (DbUpdateException ex)
         {
-            throw;
-        }
-        catch(Exception)
-        {
-            throw;
+            var message = $"Error trying to update resource with code {code}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -86,13 +87,11 @@ public class EditionTypeService : IEditionTypeService
         {
             await _repository.DeleteAsync(code);
         }
-        catch(ResourceNotFoundException) 
+        catch (DbUpdateException ex)
         {
-            throw;
-        }
-        catch(Exception)
-        {
-            throw;
+            var message = $"Error trying to update resource with code {code}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }   
 }

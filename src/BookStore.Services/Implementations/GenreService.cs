@@ -1,20 +1,25 @@
-using System;
 using BookStore.Common.Exceptions;
-using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
-using BookStore.Data.Repository.Repositories;
 using BookStore.Services.DTOs;
+using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace BookStore.Services.Implementations;
 
 public class GenreService : IGenreService
 {
     private readonly IGenreRepository _repository;
+    private readonly ILogger _logger;
 
-    public GenreService(IGenreRepository repository)
-        => _repository = repository;
+    public GenreService(IGenreRepository repository, ILogger<GenreService> logger)
+    {
+        _repository = repository;
+        _logger = logger;
+    }
 
     public async Task<GenreDto> GetByCodeAsync(string code)
     {
@@ -23,10 +28,6 @@ public class GenreService : IGenreService
             return (await _repository.GetByCodeAsync(code)).ToDto();
         }
         catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
         {
             throw;
         }
@@ -42,10 +43,6 @@ public class GenreService : IGenreService
         {
             throw;
         }
-        catch(Exception)
-        {
-            throw;
-        }
     }
 
     public async Task<GenreDto> CreateAsync(GenreDto genre)
@@ -58,9 +55,11 @@ public class GenreService : IGenreService
 
             return genreDao.ToDto();
         }
-        catch(Exception)
+        catch (DbUpdateException ex)
         {
-            throw;
+            var message = "Error trying to create resource";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -70,13 +69,11 @@ public class GenreService : IGenreService
         {
             await _repository.UpdateAsync(code, genre.ToDao());
         }
-        catch(ResourceNotFoundException) 
+        catch (DbUpdateException ex)
         {
-            throw;
-        }
-        catch(Exception)
-        {
-            throw;
+            var message = $"Error trying to update resource with code {code}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
     
@@ -90,9 +87,11 @@ public class GenreService : IGenreService
         {
             throw;
         }
-        catch(Exception)
+        catch (DbUpdateException ex)
         {
-            throw;
+            var message = $"Error trying to update resource with code {code}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }    
 }
