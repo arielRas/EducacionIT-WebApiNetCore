@@ -18,15 +18,13 @@ internal class CriticalExceptionHandler
     {
         var traceId = Guid.NewGuid();
 
-        _logger.LogError(ex, $"{traceId} - {message}");
+        _logger.LogError(ex, $"{traceId} - Method: {methodName} - {message}");
 
-        CriticalException crititcalException = ex switch
+        return ex switch
         {
             DbUpdateException => new DataBaseException(message, traceId),
             SecurityException => new SecurityException(message, traceId),
             _ => throw new NotSupportedException($"Unsupported exception type: {ex.GetType().Name}")
         };
-
-        return crititcalException;
     }
 }

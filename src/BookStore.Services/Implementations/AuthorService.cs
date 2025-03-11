@@ -2,6 +2,7 @@ using System;
 using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
+using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -71,13 +72,9 @@ public class AuthorService : IAuthorService
         }
         catch(DbUpdateException ex)
         {
-            var traceId = Guid.NewGuid();
+            var message = "Error trying to create resource";
 
-            var message = "Error trying to create new resource";
-
-            _logger.LogError(ex, $"{traceId} - {nameof(CreateAsync)} method, {message}");
-
-            throw new DataBaseException(message, traceId);
+            throw _logger.HandleAndThrow(ex, nameof(CreateAsync), message);
         }
     }
 
@@ -91,13 +88,9 @@ public class AuthorService : IAuthorService
         }
         catch (DbUpdateException ex)
         {
-            var traceId = Guid.NewGuid();
-
             var message = $"Error trying to update resource with Id {id}";
 
-            _logger.LogError(ex, $"{traceId} - {nameof(UpdateAsync)} method, {message}");
-
-            throw new DataBaseException(message, traceId);
+            throw _logger.HandleAndThrow(ex, nameof(UpdateAsync), message);
         }
     }
 
@@ -109,13 +102,9 @@ public class AuthorService : IAuthorService
         }
         catch (DbUpdateException ex)
         {
-            var traceId = Guid.NewGuid();
-
             var message = $"Error trying to delete resource with Id {id}";
 
-            _logger.LogError(ex, $"{traceId} - {nameof(DeleteAsync)} method, {message}");
-
-            throw new DataBaseException(message, traceId);
+            throw _logger.HandleAndThrow(ex, nameof(DeleteAsync), message);
         }        
     }       
 }
