@@ -1,14 +1,19 @@
 using System;
 using System.Linq.Expressions;
+using System.Net;
+using System.Reflection;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
 using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.DTOs;
+using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using BookStore.Services.Validators;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
@@ -16,11 +21,13 @@ public class EditionService : IEditionService
 {
     private readonly IEditionRepository _repository;
     private readonly IEditionUnitOfWork _unitOfWork;
+    private readonly ILogger _logger;
 
-    public EditionService(IEditionRepository repository, IEditionUnitOfWork unitOfWork)
+    public EditionService(IEditionRepository repository, IEditionUnitOfWork unitOfWork, ILogger<EditionService> logger)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
 
@@ -36,10 +43,6 @@ public class EditionService : IEditionService
         {
             throw;
         }
-        catch(Exception)
-        {
-            throw;
-        }
     }
 
 
@@ -52,10 +55,6 @@ public class EditionService : IEditionService
             return editions.Select(e => e.ToDto());
         }
         catch(ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch(Exception)
         {
             throw;
         }
@@ -75,11 +74,7 @@ public class EditionService : IEditionService
         catch(ResourceNotFoundException)
         {
             throw;
-        }
-        catch(Exception)
-        {
-            throw;
-        }        
+        }       
     }
 
 
@@ -112,16 +107,15 @@ public class EditionService : IEditionService
 
             return editionDao.ToDto(); 
         }
-        catch(BusinessException)
-        {
-            throw;
-        }
-        catch(ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = "Error trying to create resource";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
-        catch(Exception)
+        catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
             throw;
@@ -147,17 +141,11 @@ public class EditionService : IEditionService
 
             await _unitOfWork.EditionRepository.UpdateAsync(id, edition.ToDao());
         }
-        catch (BusinessException) 
+        catch (DbUpdateException ex)
         {
-            throw;
-        }
-        catch(ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch (Exception) 
-        {
-            throw;
+            var message = $"Error trying to update resource with Id {id}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -169,13 +157,11 @@ public class EditionService : IEditionService
             await _unitOfWork.IsbnRepository.UpdateByEditionIdAsync(id, isbn);
 
         }
-        catch(ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
-            throw;
-        }
-        catch(Exception)
-        {
-            throw;
+            var message = $"Error trying to update ISBN for Edition id {id}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -184,16 +170,13 @@ public class EditionService : IEditionService
     {
         try
         {
-            await _unitOfWork.EditionPriceRepository.UpdateAsync(id, price);
-                        
+            await _unitOfWork.EditionPriceRepository.UpdateAsync(id, price);                        
         }
-        catch(ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
-            throw;
-        }
-        catch(Exception)
-        {
-            throw;
+            var message = $"Error trying to update Price for Edition id {id}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -209,12 +192,15 @@ public class EditionService : IEditionService
             await _unitOfWork.CommitTransactionAsync();
                         
         }
-        catch(ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = $"Error trying to delete resource with id {id}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
-        catch(Exception)
+        catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
             throw;

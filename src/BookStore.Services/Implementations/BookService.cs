@@ -1,9 +1,5 @@
-using System;
-using System.Net;
-using System.Reflection;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
-using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.DTOs;
@@ -12,6 +8,7 @@ using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace BookStore.Services.Implementations;
 
