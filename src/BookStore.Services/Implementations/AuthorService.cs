@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
@@ -74,7 +75,7 @@ public class AuthorService : IAuthorService
         {
             var message = "Error trying to create resource";
 
-            throw _logger.HandleAndThrow(ex, nameof(CreateAsync), message);
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -90,7 +91,7 @@ public class AuthorService : IAuthorService
         {
             var message = $"Error trying to update resource with Id {id}";
 
-            throw _logger.HandleAndThrow(ex, nameof(UpdateAsync), message);
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -104,7 +105,7 @@ public class AuthorService : IAuthorService
         {
             var message = $"Error trying to delete resource with Id {id}";
 
-            throw _logger.HandleAndThrow(ex, nameof(DeleteAsync), message);
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }        
     }       
 }

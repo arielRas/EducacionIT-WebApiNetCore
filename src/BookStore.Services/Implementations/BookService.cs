@@ -1,12 +1,17 @@
 using System;
+using System.Net;
+using System.Reflection;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
 using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.DTOs;
+using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
@@ -14,11 +19,13 @@ public class BookService : IBookService
 {
     private readonly IBookRepository _repository;
     private readonly IBookUnitOfWork _unitOfWork;
+    private readonly ILogger _logger;
 
-    public BookService(IBookRepository repository, IBookUnitOfWork unitOfWork)
+    public BookService(IBookRepository repository, IBookUnitOfWork unitOfWork, ILogger<BookService> logger)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
 
@@ -32,10 +39,6 @@ public class BookService : IBookService
         {
             throw;
         }
-        catch (Exception)
-        {
-            throw;
-        }
     }
 
 
@@ -46,10 +49,6 @@ public class BookService : IBookService
             return (await _repository.GetAllAsync()).Select(b => b.ToDto());
         }
         catch (ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch (Exception)
         {
             throw;
         }
@@ -67,10 +66,6 @@ public class BookService : IBookService
             return books.Select(b => b.ToDto());
         }
         catch (ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch (Exception)
         {
             throw;
         }
@@ -105,10 +100,13 @@ public class BookService : IBookService
 
             return bookDao.ToDto();
         }
-        catch (ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = "Error trying to create resource";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
         catch (Exception)
         {
@@ -130,9 +128,11 @@ public class BookService : IBookService
         {
             throw;
         }
-        catch (Exception)
+        catch (DbUpdateException ex)
         {
-            throw;
+            var message = $"Error trying to update resource with Id {id}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -154,10 +154,13 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = $"Error trying to update genres for book id {bookId}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
         catch (Exception)
         {
@@ -184,10 +187,13 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = $"Error trying to update genres for book id {bookId}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
         catch (Exception)
         {
@@ -207,10 +213,13 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (ResourceNotFoundException)
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = $"Error trying to delete resource with id {id}";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
         catch (Exception)
         {
