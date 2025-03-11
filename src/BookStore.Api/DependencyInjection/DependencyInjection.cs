@@ -31,8 +31,11 @@ public static class DependencyInjection
         services.AddDbContext<AuthDbContext>(option =>
             option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
 
+
         //Registro de configuraciones
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"))
+                .Configure<DefaultRoleSettings>(configuration.GetSection("DefaultRoleSettings"));
+
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
@@ -53,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<JwtGeneratorService>();
 
+
         //Registro y configuracion de servicios de autenticacion Identity
         services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
@@ -68,6 +72,7 @@ public static class DependencyInjection
         })
         .AddEntityFrameworkStores<AuthDbContext>()
         .AddDefaultTokenProviders();
+
 
         //Autenticacion JWT
         services.AddAuthentication(options =>
@@ -92,6 +97,7 @@ public static class DependencyInjection
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
             };
         });
+
 
         //Se registra Swagger como explorador de Endpoints y se agrega campo para utilizar JWT
         services.AddEndpointsApiExplorer();

@@ -1,5 +1,6 @@
 using System;
 using System.Security.Authentication;
+using BookStore.Common.Configuration;
 using BookStore.Common.Exceptions;
 using BookStore.Data.UnitOfWork;
 using BookStore.Services.DTOs;
@@ -7,26 +8,27 @@ using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using BookStore.Services.Security;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BookStore.Services.Implementations;
 
 public class AuthService : IAuthService
 {
-    private readonly IAuthUnitOfWork _unitOfWork;    
-    private readonly JwtGeneratorService _tokenGenerator;
+    private readonly IAuthUnitOfWork _unitOfWork;
     private readonly ILogger _logger;
-    private readonly string _defaultRole;
+    private readonly JwtGeneratorService _tokenGenerator;    
+    private readonly DefaultRoleSettings _defaultRole;
 
     public AuthService(
         IAuthUnitOfWork unitOfWork,
-        IConfiguration configuration,
-        JwtGeneratorService tokenGenerator,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger,
+        IOptions<DefaultRoleSettings> defaultRolesettings,
+        JwtGeneratorService tokenGenerator
+    )    
     {
         _unitOfWork = unitOfWork;
-        _defaultRole = configuration.GetSection("identity:DefaultRole").Value!;
+        _defaultRole = defaultRolesettings.Value;
         _tokenGenerator = tokenGenerator;
         _logger = logger;
     }   
@@ -44,7 +46,7 @@ public class AuthService : IAuthService
             if(!result.Succeeded)
                 throw new AuthenticationException(result.Errors.ToString());
 
-            result = await _unitOfWork.UserManager.AddToRoleAsync(newUser, _defaultRole);
+            result = await _unitOfWork.UserManager.AddToRoleAsync(newUser, _defaultRole.RoleName);
 
             if(!result.Succeeded)
                 throw new AuthenticationException(result.Errors.ToString());
