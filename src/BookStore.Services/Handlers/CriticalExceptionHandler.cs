@@ -14,7 +14,7 @@ internal class CriticalExceptionHandler
     public static CriticalExceptionHandler Create(ILogger logger)
         => new CriticalExceptionHandler(logger);
 
-    public CriticalException HandleAndThrow(Exception ex, string message)
+    public CriticalException HandleAndThrow(Exception ex, string methodName, string message)
     {
         var traceId = Guid.NewGuid();
 
