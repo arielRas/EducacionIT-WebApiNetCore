@@ -1,13 +1,16 @@
 using System;
+using System.Reflection;
 using System.Security.Authentication;
 using BookStore.Common.Configuration;
 using BookStore.Common.Exceptions;
 using BookStore.Data.UnitOfWork;
 using BookStore.Services.DTOs;
+using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using BookStore.Services.Security;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -44,19 +47,22 @@ public class AuthService : IAuthService
             var result = await _unitOfWork.UserManager.CreateAsync(newUser, user.Password);
 
             if(!result.Succeeded)
-                throw new AuthenticationException(result.Errors.ToString());
+                throw new AuthException(result.Errors.ToString()!);
 
             result = await _unitOfWork.UserManager.AddToRoleAsync(newUser, _defaultRole.RoleName);
 
             if(!result.Succeeded)
-                throw new AuthenticationException(result.Errors.ToString());
+                throw new AuthException(result.Errors.ToString()!);
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch(AuthenticationException)
+        catch(DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
-            throw;
+
+            var message = "Error trying to register a new user";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }        
         catch(Exception)
         {
@@ -71,29 +77,23 @@ public class AuthService : IAuthService
         try
         {
             var user = await _unitOfWork.UserManager.FindByNameAsync(userName)
-                ?? throw new ResourceNotFoundException();
+                ?? throw new AuthException(
+                    $"Inconsistency when searching for user {userName}. The user cannot be found even though they have already logged in successfully."
+                );
 
-            var roles = await _unitOfWork.UserManager.GetRolesAsync(user);
+            var roles = await _unitOfWork.UserManager.GetRolesAsync(user)
+                ?? throw new AuthException($"Error trying to find the roles for user {userName}"); 
 
             return _tokenGenerator.Generate(user.ToDto(roles));
         }
-        catch(ResourceNotFoundException ex)
-        {
-           _logger.LogError(ex, $"{nameof(GetJwtTokenAsync)} method, Error trying to get user with userName {userName}");
-           
-           throw;
-        } 
         catch(AuthException ex)
         {
-            var errorId = Guid.NewGuid();    
-
-            _logger.LogError(ex, $"ErrorId: {errorId}. {nameof(GetJwtTokenAsync)} method, error generating security token");
-
-            var message = "Unexpected error occurred during authentication process, please contact application support";           
-
-            throw new AuthException($"{errorId} - {message}");
-        }        
+            var message = "Internal error while trying to authenticate the user";
+                      
+           throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+        }
     }
+
 
     public async Task<RoleDto> CreateRoleAsync(string roleName)
     {
@@ -104,18 +104,27 @@ public class AuthService : IAuthService
             var result = await _unitOfWork.RoleManager.CreateAsync(role);
 
             if(!result.Succeeded)
-                throw new AuthenticationException(result.Errors.ToString());
+                throw new AuthException(result.Errors.ToString()!);
             
             role = await _unitOfWork.RoleManager.FindByNameAsync(roleName)
-                ?? throw new ResourceNotFoundException($"Role with name {roleName} is not found");
+                ?? throw new ResourceNotFoundException($"Error trying to create a new role {roleName}");
 
             return role.ToDto();
         }       
-        catch(Exception)
+        catch(AuthException ex)
         {
-            throw;
-        } 
+            var message = "Internal error while trying to create new role";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+        }
+        catch (DbUpdateException ex)
+        {
+            var message = "Error trying to create resource";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+        }
     }
+
 
     public async Task<RoleDto> GetRoleByIdAsync(Guid id)
     {

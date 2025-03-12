@@ -24,6 +24,8 @@ internal class CriticalExceptionHandler
         {
             DbUpdateException => new DataBaseException(message, traceId),
             SecurityException => new SecurityException(message, traceId),
+            AuthException => new SecurityException(message, traceId),
+            DataBaseException => new DataBaseException(message, traceId),
             _ => throw new NotSupportedException($"Unsupported exception type: {ex.GetType().Name}")
         };
     }
