@@ -56,7 +56,15 @@ public class AuthService : IAuthService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch(DbUpdateException ex)
+        catch (AuthException ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+
+            var message = "Error trying to register a new user";
+
+            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+        }
+        catch (DbUpdateException ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
 

@@ -1,4 +1,5 @@
-﻿using BookStore.Common.Exceptions;
+﻿using BookStore.Api.Models.Mappers;
+using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -39,9 +40,14 @@ public class AuthController : ControllerBase
 
             return Ok(new { Token = token });
         }
-        catch (ResourceNotFoundException)
+        catch (SecurityException ex)
         {
-            return Unauthorized(new { message = "Invalid Credential" });
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode,
+                ex.ToApiError(HttpContext.Request.Path.Value!, statusCode
+            ));
         }
     }
 
@@ -63,9 +69,29 @@ public class AuthController : ControllerBase
 
             return Created(baseUrl, new { UserName = user.Username });
         }
-        catch (AuthenticationException ex)
+        catch (SecurityException ex)
         {
-            return BadRequest(ex.Message);
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
+        }
+        catch (AuthException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -86,9 +112,21 @@ public class AuthController : ControllerBase
 
             return CreatedAtAction(nameof(GetRole), new {Id = role.Id}, role);
         }
-        catch (AuthenticationException ex)
+        catch (SecurityException ex)
         {
-            return BadRequest(ex.Message);
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -112,7 +150,11 @@ public class AuthController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(new {message = ex.Message});
+            return NotFound(
+                ex.ToApiError(
+                    HttpContext.Request.Path.Value!,
+                    StatusCodes.Status404NotFound
+                ));
         }
     }
 
