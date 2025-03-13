@@ -1,3 +1,4 @@
+using BookStore.Api.Models.Mappers;
 using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
@@ -34,7 +35,9 @@ public class EditorialsController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
         }
     }
 
@@ -53,7 +56,9 @@ public class EditorialsController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
         }
     }
 
@@ -77,9 +82,13 @@ public class EditorialsController : ControllerBase
 
             return CreatedAtAction(nameof(GetById), new { Id = editorial.Id }, editorial);
         }
-        catch (Exception)
+        catch (DataBaseException ex)
         {
-            throw;
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -108,7 +117,17 @@ public class EditorialsController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -131,7 +150,17 @@ public class EditorialsController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 }

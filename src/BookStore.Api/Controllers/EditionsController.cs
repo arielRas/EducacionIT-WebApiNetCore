@@ -1,3 +1,4 @@
+using BookStore.Api.Models.Mappers;
 using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
@@ -33,9 +34,11 @@ public class EditionsController : ControllerBase
 
             return Ok(edition);
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
         }
     }
 
@@ -52,9 +55,11 @@ public class EditionsController : ControllerBase
 
             return Ok(editions);
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
         }
     }
 
@@ -75,9 +80,11 @@ public class EditionsController : ControllerBase
 
             return Ok(editions);
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
         }
     }
 
@@ -95,9 +102,19 @@ public class EditionsController : ControllerBase
 
             return CreatedAtAction(nameof(GetById), new { Id = newEdition.Id }, newEdition);
         }
-        catch(BusinessException ex)
+        catch (BusinessException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status400BadRequest)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -121,11 +138,23 @@ public class EditionsController : ControllerBase
         }
         catch(BusinessException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status400BadRequest)
+            );
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -150,9 +179,19 @@ public class EditionsController : ControllerBase
 
             return NoContent();
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -177,9 +216,19 @@ public class EditionsController : ControllerBase
 
             return NoContent();
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 
@@ -201,9 +250,19 @@ public class EditionsController : ControllerBase
 
             return NoContent();
         }
-        catch(ResourceNotFoundException ex)
+        catch (ResourceNotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
+            );
+        }
+        catch (DataBaseException ex)
+        {
+            var statusCode = StatusCodes.Status500InternalServerError;
+
+            return StatusCode(
+                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            );
         }
     }
 }
