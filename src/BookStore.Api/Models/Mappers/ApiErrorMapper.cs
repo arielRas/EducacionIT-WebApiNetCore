@@ -15,15 +15,17 @@ namespace BookStore.Api.Models.Mappers
             };
         }
 
-        public static ApiErrorCritical ToApiError(this CriticalException ex, string path, int statusCode)
+        public static ApiErrorCritical ToApiError(this Exception ex, Guid traceId, string path, int statusCode)
         {
             return new ApiErrorCritical
             {
-                Id = ex.TraceId,
+                Id = traceId,
                 TimeStamp = DateTime.UtcNow,
                 Status = statusCode,
                 Path = path,
-                Description = ex.Message
+                Description = statusCode != 500
+                              ? ex.Message
+                              : "Unexpected error, please contact application support"
             };
         }
     }

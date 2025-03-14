@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json;
+using BookStore.Api.Extensions;
 using BookStore.Api.Models;
+using BookStore.Api.Models.Mappers;
 using BookStore.Common.Exceptions;
 
 namespace BookStore.Api.Middleware;
@@ -25,39 +27,12 @@ public class GlobalExceptionMiddleware
         }
         catch(Exception ex)
         {
-            var errorId = Guid.NewGuid();
+            var traceId = Guid.NewGuid();
 
-            _logger.LogError(ex, $"ErrorId: {errorId}: Unexpected error occurred.");
+            _logger.LogError(
+                ex, $"ErrorId: {traceId} - Unexpected error occurred in {context.Request.Path.Value!}.");
 
-            await HandleExceptionAsync(context, ex, errorId);
+            await context.WriteExceptionResponseAsync(ex, traceId);
         }
-    }
-
-    private static Task HandleExceptionAsync(HttpContext context, Exception ex, Guid errorId)
-    {
-        var response = context.Response;
-
-        response.ContentType = "application/json";
-
-        response.StatusCode = ex switch
-        {
-            ResourceNotFoundException => StatusCodes.Status404NotFound,
-            BusinessException => StatusCodes.Status400BadRequest,
-            AuthException => StatusCodes.Status401Unauthorized,
-            _ => StatusCodes.Status500InternalServerError
-        };
-
-        var error = new ApiErrorCritical
-        {
-            Id = errorId,
-            TimeStamp = DateTime.UtcNow,
-            Path = context.Request.Path.Value,
-            Status = response.StatusCode,
-            Description = response.StatusCode != 500 
-                          ? ex.Message 
-                          : "Unexpected error, please contact application support"  
-        };
-
-        return response.WriteAsync(JsonSerializer.Serialize(error));
     }
 }
