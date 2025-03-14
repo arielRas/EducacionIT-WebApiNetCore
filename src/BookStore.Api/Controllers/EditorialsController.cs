@@ -82,13 +82,9 @@ public class EditorialsController : ControllerBase
 
             return CreatedAtAction(nameof(GetById), new { Id = editorial.Id }, editorial);
         }
-        catch (DataBaseException ex)
+        catch(Exception)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
+            throw;
         }
     }
 
@@ -121,14 +117,6 @@ public class EditorialsController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -152,14 +140,6 @@ public class EditorialsController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }

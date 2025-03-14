@@ -1,12 +1,7 @@
-using System;
-using System.Reflection;
-using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
-using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
@@ -16,11 +11,8 @@ public class EditionTypeService : IEditionTypeService
     private readonly IEditionTypeRepository _repository;
     private readonly ILogger _logger;
 
-    public EditionTypeService(IEditionTypeRepository repository, ILogger<EditionTypeService> logger)
-    {
-        _repository = repository;
-        _logger = logger;
-    }
+    public EditionTypeService(IEditionTypeRepository repository)
+        => _repository = repository;
 
     public async Task<EditionTypeDto> GetByCodeAsync(string code)
     {
@@ -28,7 +20,7 @@ public class EditionTypeService : IEditionTypeService
         {
             return (await _repository.GetByCodeAsync(code)).ToDto();
         }
-        catch(ResourceNotFoundException) 
+        catch (Exception)
         {
             throw;
         }
@@ -42,7 +34,7 @@ public class EditionTypeService : IEditionTypeService
 
             return editionTypes.Select(e => e.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch (Exception)
         {
             throw;
         }
@@ -58,11 +50,9 @@ public class EditionTypeService : IEditionTypeService
 
             return editionTypeDao.ToDto();
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = "Error trying to create resource";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
 
     }
@@ -73,11 +63,9 @@ public class EditionTypeService : IEditionTypeService
         {
             await _repository.UpdateAsync(code, type.ToDao());
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = $"Error trying to update resource with code {code}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }
 
@@ -87,11 +75,9 @@ public class EditionTypeService : IEditionTypeService
         {
             await _repository.DeleteAsync(code);
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = $"Error trying to update resource with code {code}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }   
 }

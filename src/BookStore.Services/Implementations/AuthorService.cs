@@ -1,12 +1,7 @@
-using System;
-using System.Reflection;
-using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
-using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
@@ -14,14 +9,10 @@ namespace BookStore.Services.Implementations;
 public class AuthorService : IAuthorService
 {
     private readonly IAuthorRepository _repository;
-    private readonly ILogger _logger;
     
 
     public AuthorService(IAuthorRepository repository, ILogger<AuthorService> logger)
-    {
-        _repository = repository;
-        _logger = logger;
-    } 
+        => _repository = repository;
 
     public async Task<AuthorDto> GetByIdAsync(int id)
     {        
@@ -31,7 +22,7 @@ public class AuthorService : IAuthorService
             
             return author.ToResponseDto();
         }
-        catch(ResourceNotFoundException) 
+        catch(Exception) 
         {
             throw;
         }
@@ -43,7 +34,7 @@ public class AuthorService : IAuthorService
         {
             return (await _repository.GetAllFilteredAsync(filter)).Select(a => a.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch(Exception) 
         {
             throw;
         }
@@ -55,7 +46,7 @@ public class AuthorService : IAuthorService
         {
             return (await _repository.GetAllAsync()).Select(a => a.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch(Exception) 
         {
             throw;
         }      
@@ -71,11 +62,9 @@ public class AuthorService : IAuthorService
 
             return authorDao.ToDto();
         }
-        catch(DbUpdateException ex)
+        catch(Exception)
         {
-            var message = "Error trying to create resource";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }
 
@@ -87,11 +76,9 @@ public class AuthorService : IAuthorService
 
             await _repository.UpdateAsync(id, author.ToDao());
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = $"Error trying to update resource with Id {id}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }
 
@@ -101,11 +88,9 @@ public class AuthorService : IAuthorService
         {
             await _repository.DeleteAsync(id);
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = $"Error trying to delete resource with Id {id}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
-        }        
+            throw;
+        }
     }       
 }

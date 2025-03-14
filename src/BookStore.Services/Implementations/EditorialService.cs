@@ -1,26 +1,16 @@
-using System;
-using System.Reflection;
-using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
-using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
 public class EditorialService : IEditorialService
 {
     private readonly IEditorialRepository _repository;
-    private readonly ILogger _logger;
 
-    public EditorialService(IEditorialRepository repository, ILogger<EditorialService> logger)
-    {
-        _repository = repository;
-        _logger = logger;
-    }
+    public EditorialService(IEditorialRepository repository)
+        => _repository = repository;
 
     public async Task<EditorialDto> GetByIdAsync(int id)
     {
@@ -28,7 +18,7 @@ public class EditorialService : IEditorialService
         {
             return (await _repository.GetByIdAsync(id)).ToDto();
         }
-        catch(ResourceNotFoundException) 
+        catch (Exception)
         {
             throw;
         }
@@ -40,7 +30,7 @@ public class EditorialService : IEditorialService
         {
             return (await _repository.GetAllAsync()).Select(e => e.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch (Exception)
         {
             throw;
         }
@@ -56,11 +46,9 @@ public class EditorialService : IEditorialService
 
             return editorialDao.ToDto();
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = "Error trying to create resource";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }
 
@@ -72,11 +60,9 @@ public class EditorialService : IEditorialService
 
             await _repository.UpdateAsync(id, editorial.ToDao());
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = $"Error trying to update resource with id {id}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }
 
@@ -86,11 +72,9 @@ public class EditorialService : IEditorialService
         {
             await _repository.DeleteAsync(id);
         }
-        catch (DbUpdateException ex)
+        catch (Exception)
         {
-            var message = $"Error trying to update resource with id {id}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
+            throw;
         }
     }   
 }

@@ -82,13 +82,9 @@ public class AuthorsController : ControllerBase
 
             return CreatedAtAction(nameof(GetById), new { Id = author.Id}, author);
         }
-        catch (DataBaseException ex) 
-        { 
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            ); 
+        catch (Exception) 
+        {
+            throw; 
         }
     }
 
@@ -119,14 +115,6 @@ public class AuthorsController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex) 
-        { 
-            var statusCode = StatusCodes.Status500InternalServerError;
-            
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            ); 
-        }
     }
 
 
@@ -152,14 +140,6 @@ public class AuthorsController : ControllerBase
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
-        }
-        catch (DataBaseException ex) 
-        { 
-            var statusCode = StatusCodes.Status500InternalServerError;
-            
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            ); 
         }
     }
 }

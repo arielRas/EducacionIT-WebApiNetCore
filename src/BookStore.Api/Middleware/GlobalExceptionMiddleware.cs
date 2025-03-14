@@ -1,9 +1,4 @@
-using System;
-using System.Text.Json;
 using BookStore.Api.Extensions;
-using BookStore.Api.Models;
-using BookStore.Api.Models.Mappers;
-using BookStore.Common.Exceptions;
 
 namespace BookStore.Api.Middleware;
 

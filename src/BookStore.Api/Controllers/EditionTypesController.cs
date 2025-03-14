@@ -84,13 +84,9 @@ public class EditionTypesController : ControllerBase
 
             return CreatedAtAction(nameof(GetByCode), new { code = editionType.Code }, editionType);
         }
-        catch (DataBaseException ex)
+        catch (Exception)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
+            throw;
         }
     }
 
@@ -124,14 +120,6 @@ public class EditionTypesController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -156,14 +144,6 @@ public class EditionTypesController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }

@@ -83,13 +83,9 @@ public class GenresController : ControllerBase
 
             return CreatedAtAction(nameof(GetByCode), new { code = genre.Code }, genre);
         }
-        catch (DataBaseException ex)
+        catch (Exception)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
+            throw;
         }
     }
 
@@ -123,14 +119,6 @@ public class GenresController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -155,14 +143,6 @@ public class GenresController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }
