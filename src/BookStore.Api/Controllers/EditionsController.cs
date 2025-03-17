@@ -108,14 +108,6 @@ public class EditionsController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status400BadRequest)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -148,14 +140,6 @@ public class EditionsController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -183,14 +167,6 @@ public class EditionsController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }
@@ -222,14 +198,6 @@ public class EditionsController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -254,14 +222,6 @@ public class EditionsController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }
