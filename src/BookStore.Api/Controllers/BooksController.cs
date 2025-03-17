@@ -108,12 +108,10 @@ public class BooksController : ControllerBase
             return CreatedAtAction(nameof(GetById), new {Id = book.Id}, newBook);
             
         }
-        catch (DataBaseException ex)
+        catch (ResourceNotFoundException ex)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
+            return NotFound(
+                ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
     }
@@ -140,14 +138,6 @@ public class BooksController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }
@@ -180,14 +170,6 @@ public class BooksController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }
@@ -225,14 +207,6 @@ public class BooksController : ControllerBase
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
             );
         }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
     }
 
 
@@ -257,14 +231,6 @@ public class BooksController : ControllerBase
         {
             return NotFound(
                 ex.ToApiError(HttpContext.Request.Path.Value!, StatusCodes.Status404NotFound)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
             );
         }
     }

@@ -3,12 +3,9 @@ using BookStore.Common.Validations;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.DTOs;
-using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 
 namespace BookStore.Services.Implementations;
 
@@ -16,13 +13,11 @@ public class BookService : IBookService
 {
     private readonly IBookRepository _repository;
     private readonly IBookUnitOfWork _unitOfWork;
-    private readonly ILogger _logger;
 
     public BookService(IBookRepository repository, IBookUnitOfWork unitOfWork, ILogger<BookService> logger)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
-        _logger = logger;
     }
 
 
@@ -32,7 +27,7 @@ public class BookService : IBookService
         {
             return (await _repository.GetByIdAsync(id)).ToResponseDto();
         }
-        catch (ResourceNotFoundException)
+        catch (Exception)
         {
             throw;
         }
@@ -45,7 +40,7 @@ public class BookService : IBookService
         {
             return (await _repository.GetAllAsync()).Select(b => b.ToDto());
         }
-        catch (ResourceNotFoundException)
+        catch (Exception)
         {
             throw;
         }
@@ -62,7 +57,7 @@ public class BookService : IBookService
 
             return books.Select(b => b.ToDto());
         }
-        catch (ResourceNotFoundException)
+        catch (Exception)
         {
             throw;
         }
@@ -97,14 +92,6 @@ public class BookService : IBookService
 
             return bookDao.ToDto();
         }
-        catch (DbUpdateException ex)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-
-            var message = "Error trying to create resource";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
-        }
         catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -121,15 +108,9 @@ public class BookService : IBookService
 
             await _repository.UpdateAsync(id, book.ToDao());
         }
-        catch (ResourceNotFoundException)
+        catch (Exception)
         {
             throw;
-        }
-        catch (DbUpdateException ex)
-        {
-            var message = $"Error trying to update resource with Id {id}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
     }
 
@@ -150,14 +131,6 @@ public class BookService : IBookService
             await _unitOfWork.BookRepository.UpdateGenresAsync(bookId, genres);
 
             await _unitOfWork.CommitTransactionAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-
-            var message = $"Error trying to update genres for book id {bookId}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
         }
         catch (Exception)
         {
@@ -184,14 +157,6 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (DbUpdateException ex)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-
-            var message = $"Error trying to update genres for book id {bookId}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
-        }
         catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -210,14 +175,6 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (DbUpdateException ex)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-
-            var message = $"Error trying to delete resource with id {id}";
-
-            throw _logger.HandleAndThrow(ex, MethodBase.GetCurrentMethod()!.Name, message);
-        }
         catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -227,9 +184,9 @@ public class BookService : IBookService
 
 
   
-    private ResultValidation ValidateCollections<T>(IEnumerable<T> dtoList, IEnumerable<T> daoList)
+    private ResultValidation ValidateCollections<T>(IEnumerable<T> keysDtoList, IEnumerable<T> keysDaoList)
     {
-        var nonExistingElements = dtoList.Except(daoList).ToList();
+        var nonExistingElements = keysDtoList.Except(keysDaoList).ToList();
 
         if (!nonExistingElements.Any())
             return new ResultValidation();
