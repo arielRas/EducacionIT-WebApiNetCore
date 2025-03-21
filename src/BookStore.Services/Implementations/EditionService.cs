@@ -1,5 +1,3 @@
-using System;
-using System.Linq.Expressions;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
 using BookStore.Data.Databases.BookStoreDb.Entities;
@@ -9,6 +7,7 @@ using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using BookStore.Services.Validators;
+using System.Linq.Expressions;
 
 namespace BookStore.Services.Implementations;
 
@@ -32,10 +31,6 @@ public class EditionService : IEditionService
 
             return edition.ToResposeDto();
         }
-        catch(ResourceNotFoundException)
-        {
-            throw;
-        }
         catch(Exception)
         {
             throw;
@@ -51,11 +46,7 @@ public class EditionService : IEditionService
 
             return editions.Select(e => e.ToDto());
         }
-        catch(ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -72,14 +63,10 @@ public class EditionService : IEditionService
 
             return editions.Select(e => e.ToDto());
         }
-        catch(ResourceNotFoundException)
+        catch (Exception)
         {
             throw;
         }
-        catch(Exception)
-        {
-            throw;
-        }        
     }
 
 
@@ -112,16 +99,7 @@ public class EditionService : IEditionService
 
             return editionDao.ToDto(); 
         }
-        catch(BusinessException)
-        {
-            throw;
-        }
-        catch(ResourceNotFoundException)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
             throw;
@@ -147,15 +125,7 @@ public class EditionService : IEditionService
 
             await _unitOfWork.EditionRepository.UpdateAsync(id, edition.ToDao());
         }
-        catch (BusinessException) 
-        {
-            throw;
-        }
-        catch(ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch (Exception) 
+        catch (Exception)
         {
             throw;
         }
@@ -169,11 +139,7 @@ public class EditionService : IEditionService
             await _unitOfWork.IsbnRepository.UpdateByEditionIdAsync(id, isbn);
 
         }
-        catch(ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -184,14 +150,9 @@ public class EditionService : IEditionService
     {
         try
         {
-            await _unitOfWork.EditionPriceRepository.UpdateAsync(id, price);
-                        
+            await _unitOfWork.EditionPriceRepository.UpdateAsync(id, price);                        
         }
-        catch(ResourceNotFoundException)
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -209,12 +170,7 @@ public class EditionService : IEditionService
             await _unitOfWork.CommitTransactionAsync();
                         
         }
-        catch(ResourceNotFoundException)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
             throw;

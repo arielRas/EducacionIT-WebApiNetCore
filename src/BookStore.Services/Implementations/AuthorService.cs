@@ -1,17 +1,17 @@
-using System;
-using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
 public class AuthorService : IAuthorService
 {
     private readonly IAuthorRepository _repository;
+    
 
-    public AuthorService(IAuthorRepository repository)
+    public AuthorService(IAuthorRepository repository, ILogger<AuthorService> logger)
         => _repository = repository;
 
     public async Task<AuthorDto> GetByIdAsync(int id)
@@ -22,11 +22,7 @@ public class AuthorService : IAuthorService
             
             return author.ToResponseDto();
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch(Exception) 
         {
             throw;
         }
@@ -38,11 +34,7 @@ public class AuthorService : IAuthorService
         {
             return (await _repository.GetAllFilteredAsync(filter)).Select(a => a.ToDto());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch(Exception) 
         {
             throw;
         }
@@ -54,14 +46,10 @@ public class AuthorService : IAuthorService
         {
             return (await _repository.GetAllAsync()).Select(a => a.ToDto());
         }
-        catch(ResourceNotFoundException) 
+        catch(Exception) 
         {
             throw;
-        }
-        catch(Exception)
-        {
-            throw;
-        }        
+        }      
     } 
 
     public async Task<AuthorDto> CreateAsync(AuthorDto author)
@@ -88,11 +76,7 @@ public class AuthorService : IAuthorService
 
             await _repository.UpdateAsync(id, author.ToDao());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -104,11 +88,7 @@ public class AuthorService : IAuthorService
         {
             await _repository.DeleteAsync(id);
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }

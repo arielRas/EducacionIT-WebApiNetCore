@@ -1,12 +1,11 @@
-using System;
 using BookStore.Common.Exceptions;
 using BookStore.Common.Validations;
-using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Data.UnitOfWork.Interfaces;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
@@ -15,7 +14,7 @@ public class BookService : IBookService
     private readonly IBookRepository _repository;
     private readonly IBookUnitOfWork _unitOfWork;
 
-    public BookService(IBookRepository repository, IBookUnitOfWork unitOfWork)
+    public BookService(IBookRepository repository, IBookUnitOfWork unitOfWork, ILogger<BookService> logger)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
@@ -27,10 +26,6 @@ public class BookService : IBookService
         try
         {
             return (await _repository.GetByIdAsync(id)).ToResponseDto();
-        }
-        catch (ResourceNotFoundException)
-        {
-            throw;
         }
         catch (Exception)
         {
@@ -44,10 +39,6 @@ public class BookService : IBookService
         try
         {
             return (await _repository.GetAllAsync()).Select(b => b.ToDto());
-        }
-        catch (ResourceNotFoundException)
-        {
-            throw;
         }
         catch (Exception)
         {
@@ -65,10 +56,6 @@ public class BookService : IBookService
             var books = await _repository.GetFilteredByTitleOrAuthorAsync(filter);
 
             return books.Select(b => b.ToDto());
-        }
-        catch (ResourceNotFoundException)
-        {
-            throw;
         }
         catch (Exception)
         {
@@ -105,11 +92,6 @@ public class BookService : IBookService
 
             return bookDao.ToDto();
         }
-        catch (ResourceNotFoundException)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
         catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -125,10 +107,6 @@ public class BookService : IBookService
             book.Id = id;
 
             await _repository.UpdateAsync(id, book.ToDao());
-        }
-        catch (ResourceNotFoundException)
-        {
-            throw;
         }
         catch (Exception)
         {
@@ -153,11 +131,6 @@ public class BookService : IBookService
             await _unitOfWork.BookRepository.UpdateGenresAsync(bookId, genres);
 
             await _unitOfWork.CommitTransactionAsync();
-        }
-        catch (ResourceNotFoundException)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-            throw;
         }
         catch (Exception)
         {
@@ -184,11 +157,6 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (ResourceNotFoundException)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
         catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -207,11 +175,6 @@ public class BookService : IBookService
 
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch (ResourceNotFoundException)
-        {
-            await _unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
         catch (Exception)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -221,9 +184,9 @@ public class BookService : IBookService
 
 
   
-    private ResultValidation ValidateCollections<T>(IEnumerable<T> dtoList, IEnumerable<T> daoList)
+    private ResultValidation ValidateCollections<T>(IEnumerable<T> keysDtoList, IEnumerable<T> keysDaoList)
     {
-        var nonExistingElements = dtoList.Except(daoList).ToList();
+        var nonExistingElements = keysDtoList.Except(keysDaoList).ToList();
 
         if (!nonExistingElements.Any())
             return new ResultValidation();

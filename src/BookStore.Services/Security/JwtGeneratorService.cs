@@ -1,4 +1,5 @@
 ﻿using BookStore.Common.Configuration;
+using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -6,16 +7,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BookStore.Services.Security
+namespace BookStore.Services.Security;
+
+public class JwtGeneratorService
 {
-    public class JwtGeneratorService
+    private readonly JwtSettings _jwtSettings;
+
+    public JwtGeneratorService(IOptions<JwtSettings> settings)
+        => _jwtSettings = settings.Value;
+
+    public string Generate(UserLoggedDto user)
     {
-        private readonly JwtSettings _jwtSettings;
-
-        public JwtGeneratorService(IOptions<JwtSettings> settings)
-            => _jwtSettings = settings.Value;
-
-        public string Generate(UserLoggedDto user)
+        try
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
 
@@ -27,7 +30,7 @@ namespace BookStore.Services.Security
              ];
 
             claims.AddRange(
-                user.Roles.Select(role =>  new Claim(ClaimTypes.Role, role)
+                user.Roles.Select(role => new Claim(ClaimTypes.Role, role)
              ));
 
             var token = new JwtSecurityToken
@@ -40,6 +43,10 @@ namespace BookStore.Services.Security
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        catch(Exception ex)
+        {
+            throw new SecurityException("Error generating security token", ex);
         }
     }
 }

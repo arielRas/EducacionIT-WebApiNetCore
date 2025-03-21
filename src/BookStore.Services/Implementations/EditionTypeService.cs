@@ -1,15 +1,15 @@
-using System;
-using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
+using Microsoft.Extensions.Logging;
 
 namespace BookStore.Services.Implementations;
 
 public class EditionTypeService : IEditionTypeService
 {
     private readonly IEditionTypeRepository _repository;
+    private readonly ILogger _logger;
 
     public EditionTypeService(IEditionTypeRepository repository)
         => _repository = repository;
@@ -20,11 +20,7 @@ public class EditionTypeService : IEditionTypeService
         {
             return (await _repository.GetByCodeAsync(code)).ToDto();
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -38,11 +34,7 @@ public class EditionTypeService : IEditionTypeService
 
             return editionTypes.Select(e => e.ToDto());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -58,10 +50,11 @@ public class EditionTypeService : IEditionTypeService
 
             return editionTypeDao.ToDto();
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
+
     }
 
     public async Task UpdateAsync(string code, EditionTypeDto type)
@@ -70,11 +63,7 @@ public class EditionTypeService : IEditionTypeService
         {
             await _repository.UpdateAsync(code, type.ToDao());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -86,11 +75,7 @@ public class EditionTypeService : IEditionTypeService
         {
             await _repository.DeleteAsync(code);
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }

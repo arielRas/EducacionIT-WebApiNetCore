@@ -1,8 +1,4 @@
-using System;
-using BookStore.Common.Exceptions;
-using BookStore.Data.Databases.BookStoreDb.Entities;
 using BookStore.Data.Repository.Interfaces;
-using BookStore.Data.Repository.Repositories;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
@@ -22,11 +18,7 @@ public class GenreService : IGenreService
         {
             return (await _repository.GetByCodeAsync(code)).ToDto();
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -38,11 +30,7 @@ public class GenreService : IGenreService
         {
             return (await _repository.GetAllAsync()).Select(g => g.ToDto());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -58,7 +46,7 @@ public class GenreService : IGenreService
 
             return genreDao.ToDto();
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -70,11 +58,7 @@ public class GenreService : IGenreService
         {
             await _repository.UpdateAsync(code, genre.ToDao());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -86,11 +70,7 @@ public class GenreService : IGenreService
         {
             await _repository.DeleteAsync(code);
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }

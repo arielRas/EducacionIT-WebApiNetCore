@@ -1,4 +1,5 @@
-﻿using BookStore.Common.Exceptions;
+﻿using BookStore.Api.Models.Mappers;
+using BookStore.Common.Exceptions;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -37,15 +38,11 @@ public class AuthController : ControllerBase
 
             var token = await _service.GetJwtTokenAsync(user.Username);
 
-            return Ok(new { Token = token });
+            return Ok(new { Authentication = token });
         }
-        catch (ResourceNotFoundException)
+        catch (Exception)
         {
-            return Unauthorized(new { message = "Invalid Credential" });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            throw;
         }
     }
 
@@ -67,13 +64,9 @@ public class AuthController : ControllerBase
 
             return Created(baseUrl, new { UserName = user.Username });
         }
-        catch (AuthenticationException ex)
+        catch (Exception)
         {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            throw;
         }
     }
 
@@ -94,13 +87,9 @@ public class AuthController : ControllerBase
 
             return CreatedAtAction(nameof(GetRole), new {Id = role.Id}, role);
         }
-        catch (AuthenticationException ex)
+        catch (Exception)
         {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            throw;
         }
     }
 
@@ -124,13 +113,14 @@ public class AuthController : ControllerBase
         }
         catch (ResourceNotFoundException ex)
         {
-            return NotFound(new {Message = ex.Message});
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            return NotFound(
+                ex.ToApiError(
+                    HttpContext.Request.Path.Value!,
+                    StatusCodes.Status404NotFound
+                ));
         }
     }
+
 
     private async Task<bool> ValidateCredential(UserLogin user)
     {

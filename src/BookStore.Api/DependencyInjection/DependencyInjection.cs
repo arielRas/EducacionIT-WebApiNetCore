@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using AspNetCoreRateLimit;
 using BookStore.Common.Configuration;
 using BookStore.Data.Databases.AuthenticationDb;
 using BookStore.Data.Databases.BookStoreDb;
@@ -12,9 +13,9 @@ using BookStore.Services.Implementations;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -31,8 +32,20 @@ public static class DependencyInjection
         services.AddDbContext<AuthDbContext>(option =>
             option.UseSqlServer(configuration.GetConnectionString("AuthenticationDb")));
 
+
         //Registro de configuraciones
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"))
+                .Configure<DefaultRoleSettings>(configuration.GetSection("DefaultRoleSettings"))
+                .Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+
+        //Configuracion de tamaño de request
+        services.Configure<FormOptions>(option => 
+            option.MultipartBodyLengthLimit = 10 * 1024 * 1024);
+
+        //Configuración de Rate Limiting
+        services.AddMemoryCache()
+                .AddInMemoryRateLimiting();
+
 
         //Registro de servicios
         services.AddScoped<IGenreRepository, GenreRepository>();
@@ -52,12 +65,14 @@ public static class DependencyInjection
         services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<JwtGeneratorService>();
+        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 
         //Registro y configuracion de servicios de autenticacion Identity
         services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
             options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_.@";
-            options.User.RequireUniqueEmail =true;
+            options.User.RequireUniqueEmail = true;
             options.Password.RequireDigit = false;
             options.Password.RequireUppercase = true;
             options.Password.RequireNonAlphanumeric = false;
@@ -69,6 +84,7 @@ public static class DependencyInjection
         .AddEntityFrameworkStores<AuthDbContext>()
         .AddDefaultTokenProviders();
 
+
         //Autenticacion JWT
         services.AddAuthentication(options =>
         {
@@ -77,9 +93,8 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
-            var jwtSettings = services.BuildServiceProvider()
-                                      .GetService<IOptions<JwtSettings>>()?.Value
-                                      ?? throw new InvalidOperationException("JWT settings are not configured properly.");
+            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>()
+                ?? throw new ArgumentNullException("The JwtSettings key has not been configured");
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -89,12 +104,23 @@ public static class DependencyInjection
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(jwtSettings.SecretKey
+                ))
             };
         });
 
+        return services;
+    }
+
+    public static IServiceCollection AddPresentation(this IServiceCollection services)
+    {
+        //Se agregan controladores
+        services.AddControllers();
+
         //Se registra Swagger como explorador de Endpoints y se agrega campo para utilizar JWT
         services.AddEndpointsApiExplorer();
+
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "BookStore API", Version = "v1" });

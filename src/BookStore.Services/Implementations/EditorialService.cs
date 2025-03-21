@@ -1,5 +1,3 @@
-using System;
-using BookStore.Common.Exceptions;
 using BookStore.Data.Repository.Interfaces;
 using BookStore.Services.DTOs;
 using BookStore.Services.Interfaces;
@@ -20,11 +18,7 @@ public class EditorialService : IEditorialService
         {
             return (await _repository.GetByIdAsync(id)).ToDto();
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -36,11 +30,7 @@ public class EditorialService : IEditorialService
         {
             return (await _repository.GetAllAsync()).Select(e => e.ToDto());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -56,7 +46,7 @@ public class EditorialService : IEditorialService
 
             return editorialDao.ToDto();
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -70,11 +60,7 @@ public class EditorialService : IEditorialService
 
             await _repository.UpdateAsync(id, editorial.ToDao());
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -86,11 +72,7 @@ public class EditorialService : IEditorialService
         {
             await _repository.DeleteAsync(id);
         }
-        catch(ResourceNotFoundException) 
-        {
-            throw;
-        }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
