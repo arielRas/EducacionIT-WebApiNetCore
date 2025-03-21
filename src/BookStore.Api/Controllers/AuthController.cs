@@ -38,16 +38,11 @@ public class AuthController : ControllerBase
 
             var token = await _service.GetJwtTokenAsync(user.Username);
 
-            return Ok(new { Token = token });
+            return Ok(new { Authentication = token });
         }
-        catch (SecurityException ex)
+        catch (Exception)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode,
-                ex.ToApiError(HttpContext.Request.Path.Value!, statusCode
-            ));
+            throw;
         }
     }
 
@@ -69,29 +64,9 @@ public class AuthController : ControllerBase
 
             return Created(baseUrl, new { UserName = user.Username });
         }
-        catch (SecurityException ex)
+        catch (Exception)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
-        catch (AuthException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
+            throw;
         }
     }
 
@@ -112,21 +87,9 @@ public class AuthController : ControllerBase
 
             return CreatedAtAction(nameof(GetRole), new {Id = role.Id}, role);
         }
-        catch (SecurityException ex)
+        catch (Exception)
         {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
-        }
-        catch (DataBaseException ex)
-        {
-            var statusCode = StatusCodes.Status500InternalServerError;
-
-            return StatusCode(
-                statusCode, ex.ToApiError(HttpContext.Request.Path.Value!, statusCode)
-            );
+            throw;
         }
     }
 

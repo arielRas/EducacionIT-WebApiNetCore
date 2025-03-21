@@ -46,7 +46,7 @@ public class JwtGeneratorService
         }
         catch(Exception ex)
         {
-            throw new AuthException("Error generating security token", ex);
+            throw new SecurityException("Error generating security token", ex);
         }
     }
 }

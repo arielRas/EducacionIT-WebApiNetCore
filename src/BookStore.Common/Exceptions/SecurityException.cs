@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BookStore.Common.Exceptions
+﻿namespace BookStore.Common.Exceptions
 {
-    public class SecurityException : CriticalException
+    public class SecurityException : Exception
     {
-        public SecurityException(string message, Guid traceId) : base(message, traceId)
+        public SecurityException(string message) : base(message)
         {
 
         }
 
-        public SecurityException(string message, Exception innerException, Guid traceId) : base(message, innerException, traceId)
+        public SecurityException(string message, Exception innerException) : base(message, innerException)
         {
 
         }
