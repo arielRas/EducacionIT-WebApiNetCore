@@ -93,17 +93,19 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
+            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>()
+                ?? throw new ArgumentNullException("The JwtSettings key has not been configured");
+
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["JwtSettings:Issuer"],
-                ValidAudience = configuration["JwtSettings:Audience"],
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]
-                    ?? throw new ArgumentNullException("JwtSettings:SecretKey")
+                    Encoding.UTF8.GetBytes(jwtSettings.SecretKey
                 ))
             };
         });

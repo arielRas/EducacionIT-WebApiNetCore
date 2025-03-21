@@ -2,14 +2,11 @@ using BookStore.Common.Configuration;
 using BookStore.Common.Exceptions;
 using BookStore.Data.UnitOfWork;
 using BookStore.Services.DTOs;
-using BookStore.Services.Extensions;
 using BookStore.Services.Interfaces;
 using BookStore.Services.Mappers;
 using BookStore.Services.Security;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System.Reflection;
 
 namespace BookStore.Services.Implementations;
 
